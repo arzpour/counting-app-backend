@@ -18,6 +18,7 @@ const carSchema = new mongoose.Schema({
   Secretary: String,
   DocumentsCopy: String,
   SellerNationalID: String,
+  BuyerNationalID: String,
 });
 
 const Car = mongoose.model("Car", carSchema, "data");

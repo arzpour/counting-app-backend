@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const chequeSchema = new mongoose.Schema({
-  CarChassisNo: String,
+  CarChassisNo: { type: Number },
   ChequeSerial: String,
   SayadiID: String,
   ChequeAmount: Number,
