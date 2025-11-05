@@ -6,6 +6,7 @@ const carRouter = require("./car");
 const chequeRouter = require("./cheque");
 const otherApiRouter = require("./other-api-router");
 const transactionRouter = require("./transaction");
+const settingRouter = require("./settings");
 
 router.use("/auth", authRouter);
 router.use("/cars", carRouter);
@@ -13,5 +14,6 @@ router.use("/transactions", transactionRouter);
 router.use("/cheques", chequeRouter);
 router.use("/unpaid", chequeRouter);
 router.use("/others", otherApiRouter);
+router.use("/settings", settingRouter);
 
 module.exports = router;
