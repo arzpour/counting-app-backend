@@ -1,4 +1,4 @@
-const Settings = require("../models/data-settings");
+const Setting = require("../models/data-settings");
 
 // Get all categories and their options
 exports.getAllSettings = async (req, res) => {
