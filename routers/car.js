@@ -110,43 +110,114 @@ router.get("/", async (req, res) => {
   }
 });
 
+// router.get("/userData", async (req, res) => {
+//   try {
+//     const data = await Car.find();
+
+//     const peopleMap = new Map();
+
+//     data.forEach((item) => {
+//       if (item.SellerName) {
+//         const key = item.SellerName;
+//         if (!peopleMap.has(key)) {
+//           peopleMap.set(key, {
+//             name: item.SellerName,
+//             nationalId: item.SellerNationalID,
+//             roles: ["seller"],
+//           });
+//         } else {
+//           const person = peopleMap.get(key);
+//           if (!person.roles.includes("seller")) person.roles.push("seller");
+//         }
+//       }
+
+//       if (item.BuyerName) {
+//         const key = item.BuyerName;
+//         if (!peopleMap.has(key)) {
+//           peopleMap.set(key, {
+//             name: item.BuyerName,
+//             nationalId: item.BuyerNationalID,
+//             roles: ["buyer"],
+//           });
+//         } else {
+//           const person = peopleMap.get(key);
+//           if (!person.roles.includes("buyer")) person.roles.push("buyer");
+//         }
+//       }
+//     });
+
+//     const uniquePeople = Array.from(peopleMap.values());
+
+//     res.json(uniquePeople);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Error fetching cars" });
+//   }
+// });
+
+function normalizeName(name) {
+  if (!name) return null;
+  return name.trim().toLowerCase();
+}
+
 router.get("/userData", async (req, res) => {
   try {
     const data = await Car.find();
-
     const peopleMap = new Map();
 
     data.forEach((item) => {
       if (item.SellerName) {
-        const key = item.SellerName;
+        const rawName = item.SellerName;
+        const key = normalizeName(rawName);
+        if (!key) return;
+
         if (!peopleMap.has(key)) {
           peopleMap.set(key, {
-            name: item.SellerName,
-            nationalId: item.SellerNationalID,
+            name: rawName.trim(),
+            normalized: key,
+            nationalId: item.SellerNationalID || null,
             roles: ["seller"],
           });
         } else {
           const person = peopleMap.get(key);
           if (!person.roles.includes("seller")) person.roles.push("seller");
+          if ((rawName || "").length > (person.name || "").length) {
+            person.name = rawName.trim();
+          }
+          if (!person.nationalId && item.SellerNationalID) {
+            person.nationalId = item.SellerNationalID;
+          }
         }
       }
 
       if (item.BuyerName) {
-        const key = item.BuyerName;
+        const rawName = item.BuyerName;
+        const key = normalizeName(rawName);
+        if (!key) return;
+
         if (!peopleMap.has(key)) {
           peopleMap.set(key, {
-            name: item.BuyerName,
-            nationalId: item.BuyerNationalID,
+            name: rawName.trim(),
+            normalized: key,
+            nationalId: item.BuyerNationalID || null,
             roles: ["buyer"],
           });
         } else {
           const person = peopleMap.get(key);
           if (!person.roles.includes("buyer")) person.roles.push("buyer");
+          if ((rawName || "").length > (person.name || "").length) {
+            person.name = rawName.trim();
+          }
+          if (!person.nationalId && item.BuyerNationalID) {
+            person.nationalId = item.BuyerNationalID;
+          }
         }
       }
     });
 
-    const uniquePeople = Array.from(peopleMap.values());
+    const uniquePeople = Array.from(peopleMap.values()).map(
+      ({ normalized, ...rest }) => rest
+    );
 
     res.json(uniquePeople);
   } catch (err) {
@@ -154,6 +225,94 @@ router.get("/userData", async (req, res) => {
     res.status(500).json({ error: "Error fetching cars" });
   }
 });
+
+// router.get("/userData", async (req, res) => {
+//   try {
+//     const data = await Car.find();
+//     const peopleMap = new Map();
+
+//     data.forEach((item) => {
+//       if (item.SellerNationalID) {
+//         const key = item.SellerNationalID;
+//         if (!peopleMap.has(key)) {
+//           peopleMap.set(key, {
+//             name: item.SellerName,
+//             nationalId: item.SellerNationalID,
+//             roles: ["seller"],
+//           });
+//         } else {
+//           const person = peopleMap.get(key);
+//           person.name = item.SellerName || person.name;
+//           if (!person.roles.includes("seller")) person.roles.push("seller");
+//         }
+//       }
+
+//       if (item.BuyerNationalID) {
+//         const key = item.BuyerNationalID;
+//         if (!peopleMap.has(key)) {
+//           peopleMap.set(key, {
+//             name: item.BuyerName,
+//             nationalId: item.BuyerNationalID,
+//             roles: ["buyer"],
+//           });
+//         } else {
+//           const person = peopleMap.get(key);
+//           person.name = item.BuyerName || person.name;
+//           if (!person.roles.includes("buyer")) person.roles.push("buyer");
+//         }
+//       }
+//     });
+
+//     const uniquePeople = Array.from(peopleMap.values());
+//     res.json(uniquePeople);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Error fetching cars" });
+//   }
+// });
+
+// router.get("/userData", async (req, res) => {
+//   try {
+//     const data = await Car.find();
+//     const peopleMap = new Map();
+
+//     data.forEach((item) => {
+//       if (item.SellerName) {
+//         const key = item.SellerName.trim();
+//         if (!peopleMap.has(key)) {
+//           peopleMap.set(key, {
+//             name: item.SellerName.trim(),
+//             nationalId: item.SellerNationalID || "__",
+//             roles: ["seller"],
+//           });
+//         } else {
+//           const person = peopleMap.get(key);
+//           if (!person.roles.includes("seller")) person.roles.push("seller");
+//         }
+//       }
+
+//       if (item.BuyerName) {
+//         const key = item.BuyerName.trim();
+//         if (!peopleMap.has(key)) {
+//           peopleMap.set(key, {
+//             name: item.BuyerName.trim(),
+//             nationalId: item.BuyerNationalID || "__",
+//             roles: ["buyer"],
+//           });
+//         } else {
+//           const person = peopleMap.get(key);
+//           if (!person.roles.includes("buyer")) person.roles.push("buyer");
+//         }
+//       }
+//     });
+
+//     const uniquePeople = Array.from(peopleMap.values());
+//     res.json(uniquePeople);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Error fetching cars" });
+//   }
+// });
 
 router.get("/filterByUser", async (req, res) => {
   try {
@@ -176,23 +335,34 @@ router.get("/filterByUser", async (req, res) => {
           item.SellerNationalID === nationalId
       );
     } else if (userName) {
-      const name = userName.toString().trim();
-      filtered = data.filter(
-        (item) =>
-          item.BuyerName?.includes(name) || item.SellerName?.includes(name)
-      );
+      const q = normalizeName(userName.toString());
+      filtered = data.filter((item) => {
+        const buyerNorm = normalizeName(item.BuyerName);
+        const sellerNorm = normalizeName(item.SellerName);
+        return (
+          (buyerNorm && buyerNorm.includes(q)) ||
+          (sellerNorm && sellerNorm.includes(q))
+        );
+      });
     }
 
-    const sales = filtered.filter(
-      (item) =>
-        (nationalId && item.SellerNationalID === nationalId) ||
-        (!nationalId && item.SellerName?.includes(userName))
-    );
-    const purchases = filtered.filter(
-      (item) =>
-        (nationalId && item.BuyerNationalID === nationalId) ||
-        (!nationalId && item.BuyerName?.includes(userName))
-    );
+    const sales = filtered.filter((item) => {
+      if (nationalId) return item.SellerNationalID === nationalId;
+      const sellerNorm = normalizeName(item.SellerName);
+      return (
+        sellerNorm &&
+        sellerNorm.includes(normalizeName(userName?.toString() || ""))
+      );
+    });
+
+    const purchases = filtered.filter((item) => {
+      if (nationalId) return item.BuyerNationalID === nationalId;
+      const buyerNorm = normalizeName(item.BuyerName);
+      return (
+        buyerNorm &&
+        buyerNorm.includes(normalizeName(userName?.toString() || ""))
+      );
+    });
 
     res.json({ purchases, sales });
   } catch (err) {
@@ -200,6 +370,52 @@ router.get("/filterByUser", async (req, res) => {
     res.status(500).json({ error: "Error filtering user transactions" });
   }
 });
+
+// router.get("/filterByUser", async (req, res) => {
+//   try {
+//     const { nationalId, userName } = req.query;
+
+//     if (!nationalId && !userName) {
+//       return res
+//         .status(400)
+//         .json({ error: "Please provide nationalId or userName" });
+//     }
+
+//     const data = await Car.find();
+
+//     let filtered = [];
+
+//     if (nationalId) {
+//       filtered = data.filter(
+//         (item) =>
+//           item.BuyerNationalID === nationalId ||
+//           item.SellerNationalID === nationalId
+//       );
+//     } else if (userName) {
+//       const name = userName.toString().trim();
+//       filtered = data.filter(
+//         (item) =>
+//           item.BuyerName?.includes(name) || item.SellerName?.includes(name)
+//       );
+//     }
+
+//     const sales = filtered.filter(
+//       (item) =>
+//         (nationalId && item.SellerNationalID === nationalId) ||
+//         (!nationalId && item.SellerName?.includes(userName))
+//     );
+//     const purchases = filtered.filter(
+//       (item) =>
+//         (nationalId && item.BuyerNationalID === nationalId) ||
+//         (!nationalId && item.BuyerName?.includes(userName))
+//     );
+
+//     res.json({ purchases, sales });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Error filtering user transactions" });
+//   }
+// });
 
 router.get("/chassisNo", async (req, res) => {
   try {
