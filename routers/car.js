@@ -110,6 +110,64 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+// GET car by ID
+router.get("/id/:id", async (req, res) => {
+  try {
+    const car = await Car.findById(req.params.id);
+    if (!car) {
+      return res.status(404).json({ error: "Car not found" });
+    }
+    res.json(car);
+  } catch (error) {
+    console.error("Error fetching car:", error);
+    res.status(500).json({ error: "Error fetching car" });
+  }
+});
+
+
+
+// POST - Create new car
+router.post("/", async (req, res) => {
+  try {
+    const carData = req.body;
+    const newCar = new Car(carData);
+    const savedCar = await newCar.save();
+    res.status(201).json(savedCar);
+  } catch (error) {
+    console.error("Error creating car:", error);
+    res
+      .status(500)
+      .json({ error: "Error creating car", details: error.message });
+  }
+});
+
+// PUT - Update car by ID
+router.put("/id/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    const updatedCar = await Car.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedCar) {
+      return res.status(404).json({ error: "Car not found" });
+    }
+
+    res.json(updatedCar);
+  } catch (error) {
+    console.error("Error updating car:", error);
+    res
+      .status(500)
+      .json({ error: "Error updating car", details: error.message });
+  }
+});
+
+
 // router.get("/userData", async (req, res) => {
 //   try {
 //     const data = await Car.find();
