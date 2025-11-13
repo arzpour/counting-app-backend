@@ -119,7 +119,6 @@
 
 // module.exports = router;
 
-
 const router = require("express").Router();
 const Cheque = require("../models/cheques");
 
@@ -322,6 +321,19 @@ router.get("/:chassisNo", async (req, res) => {
   } catch (err) {
     console.log("🔹 err:", err);
     res.status(500).json({ error: "Error fetching cheques" });
+  }
+});
+
+router.post("/", async (req, res) => {
+  try {
+    const newCheque = new Cheque(req.body);
+    const savedCheque = await newCheque.save();
+    res.status(201).json(savedCheque);
+  } catch (error) {
+    console.error("Error creating cheque:", error);
+    res
+      .status(500)
+      .json({ error: "Error creating cheque", details: error.message });
   }
 });
 

@@ -35,4 +35,17 @@ router.get("/investment/:chassisNo", async (req, res) => {
   }
 });
 
+router.post("/", async (req, res) => {
+  try {
+    const newTransaction = new Transaction(req.body);
+    const savedTransaction = await newTransaction.save();
+    res.status(201).json(savedTransaction);
+  } catch (error) {
+    console.error("Error creating transaction:", error);
+    res
+      .status(500)
+      .json({ error: "Error creating transaction", details: error.message });
+  }
+});
+
 module.exports = router;
