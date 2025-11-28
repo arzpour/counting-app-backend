@@ -1,6 +1,7 @@
-const express = require("express");
-const router = express.Router();
-const controller = require("../controllers/settings");
+import express, { Router } from "express";
+import * as controller from "../controllers/settings";
+
+const router: Router = express.Router();
 
 router.get("/", controller.getAllSettings);
 router.get("/:category", controller.getSettingByCategory);
@@ -8,4 +9,5 @@ router.post("/", controller.createCategory);
 router.post("/:category/add", controller.addOption);
 router.delete("/:category/delete", controller.deleteOption);
 
-module.exports = router;
+export default router;
+
