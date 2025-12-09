@@ -6,9 +6,9 @@ export interface ISalariesDoc extends Document, Omit<ISalaries, "_id"> {}
 const salariesSchema = new Schema<ISalariesDoc>(
   {
     employee: {
-      personId: { type: Number, required: true },
+      personId: { type: String, required: true },
       fullName: { type: String, required: true },
-      nationalId: { type: Number, required: true },
+      nationalId: { type: String, required: true },
     },
     paymentDate: { type: String, required: true },
     forYear: { type: Number, required: true },
@@ -18,13 +18,13 @@ const salariesSchema = new Schema<ISalariesDoc>(
     grossPay: { type: Number, required: true },
     totalDeductions: { type: Number, default: 0 },
     netPay: { type: Number, required: true },
-    relatedTransactionId: { type: Number },
+    relatedTransactionId: { type: String },
     deductions: {
       insurance: { type: Number, default: 0 },
       tax: { type: Number, default: 0 },
       loanInstallments: [
         {
-          loanId: { type: Number },
+          loanId: { type: String },
           installmentNumber: { type: Number },
           amount: { type: Number },
         },

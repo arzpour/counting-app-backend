@@ -4,11 +4,13 @@ export interface ICheque {
   _id: Types.ObjectId;
   chequeNumber: number;
   bankName: string;
+  branchName: string;
   issueDate: string;
   dueDate: string;
   amount: number;
   type: string;
   status: string;
+  vin: string;
   payer: {
     personId: string;
     fullName: string;
@@ -19,8 +21,9 @@ export interface ICheque {
     fullName: string;
     nationalId: string;
   };
-  relatedDealId: number;
-  relatedTransactionId: number;
+  relatedDealId: string;
+  relatedTransactionId: string;
+  sayadiID: string;
   actions: {
     actionType: string;
     actionDate: string;

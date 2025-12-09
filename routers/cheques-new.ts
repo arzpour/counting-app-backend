@@ -14,6 +14,17 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
+// GET cheques by vin
+router.get("/vin/:vin", async (req: Request, res: Response) => {
+  try {
+    const cheques = await Cheque.find({ vin: req.params.vin });
+    res.json(cheques);
+  } catch (error) {
+    console.error("Error fetching cheques:", error);
+    res.status(500).json({ error: "Error fetching cheques" });
+  }
+});
+
 // GET cheque by ID
 router.get("/id/:id", async (req: Request, res: Response) => {
   try {
@@ -32,6 +43,7 @@ router.get("/id/:id", async (req: Request, res: Response) => {
 router.get("/deal/:dealId", async (req: Request, res: Response) => {
   try {
     const cheques = await Cheque.find({ relatedDealId: req.params.dealId });
+    console.log("🚀 ~ cheques:", cheques);
     res.json(cheques);
   } catch (error) {
     console.error("Error fetching cheques:", error);
@@ -44,10 +56,7 @@ router.get("/person/:personId", async (req: Request, res: Response) => {
   try {
     const { personId } = req.params;
     const cheques = await Cheque.find({
-      $or: [
-        { "payer.personId": personId },
-        { "payee.personId": personId },
-      ],
+      $or: [{ "payer.personId": personId }, { "payee.personId": personId }],
     });
 
     const issued = cheques.filter((c) => c.payer?.personId === personId);
@@ -82,8 +91,14 @@ router.get("/unpaid/deal/:dealId", async (req: Request, res: Response) => {
     const issued = cheques.filter((c) => c.type === "issued");
     const received = cheques.filter((c) => c.type === "received");
 
-    const totalIssuedUnpaid = issued.reduce((sum, c) => sum + (c.amount || 0), 0);
-    const totalReceivedUnpaid = received.reduce((sum, c) => sum + (c.amount || 0), 0);
+    const totalIssuedUnpaid = issued.reduce(
+      (sum, c) => sum + (c.amount || 0),
+      0
+    );
+    const totalReceivedUnpaid = received.reduce(
+      (sum, c) => sum + (c.amount || 0),
+      0
+    );
 
     res.json({
       cheques,
@@ -106,9 +121,9 @@ router.post("/", async (req: Request, res: Response) => {
     res.status(201).json(savedCheque);
   } catch (error: any) {
     console.error("Error creating cheque:", error);
-    res.status(500).json({ 
-      error: "Error creating cheque", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error creating cheque",
+      details: error.message,
     });
   }
 });
@@ -127,9 +142,9 @@ router.put("/id/:id", async (req: Request, res: Response) => {
     res.json(updatedCheque);
   } catch (error: any) {
     console.error("Error updating cheque:", error);
-    res.status(500).json({ 
-      error: "Error updating cheque", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error updating cheque",
+      details: error.message,
     });
   }
 });
@@ -156,9 +171,9 @@ router.post("/id/:id/action", async (req: Request, res: Response) => {
     res.json(cheque);
   } catch (error: any) {
     console.error("Error adding action:", error);
-    res.status(500).json({ 
-      error: "Error adding action", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error adding action",
+      details: error.message,
     });
   }
 });
@@ -178,4 +193,3 @@ router.delete("/id/:id", async (req: Request, res: Response) => {
 });
 
 export default router;
-

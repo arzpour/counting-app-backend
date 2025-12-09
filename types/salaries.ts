@@ -3,9 +3,9 @@ import { Types } from "mongoose";
 export interface ISalaries {
   _id: Types.ObjectId;
   employee: {
-    personId: number;
+    personId: string;
     fullName: string;
-    nationalId: number;
+    nationalId: string;
   };
   paymentDate: string;
   forYear: number;
@@ -15,12 +15,12 @@ export interface ISalaries {
   grossPay: number;
   totalDeductions: number;
   netPay: number;
-  relatedTransactionId: number;
+  relatedTransactionId: string;
   deductions: {
     insurance: number;
     tax: number;
     loanInstallments: {
-      loanId: number;
+      loanId: string;
       installmentNumber: number;
       amount: number;
     }[];

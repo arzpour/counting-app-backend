@@ -10,7 +10,7 @@ const expenseSchema = new Schema<IExpenseDoc>(
     expenseDate: { type: String, required: true },
     description: { type: String },
     recipientPersonId: { type: String },
-    transactionId: { type: Number },
+    transactionId: { type: String },
   },
   {
     timestamps: true,

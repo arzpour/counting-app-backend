@@ -7,11 +7,13 @@ const chequeSchema = new Schema<IChequeDoc>(
   {
     chequeNumber: { type: Number, required: true },
     bankName: { type: String, required: true },
+    branchName: { type: String },
     issueDate: { type: String },
     dueDate: { type: String, required: true },
     amount: { type: Number, required: true },
     type: { type: String, required: true },
     status: { type: String, required: true },
+    vin: { type: String },
     payer: {
       personId: { type: String },
       fullName: { type: String },
@@ -22,8 +24,9 @@ const chequeSchema = new Schema<IChequeDoc>(
       fullName: { type: String },
       nationalId: { type: String },
     },
-    relatedDealId: { type: Number },
-    relatedTransactionId: { type: Number },
+    relatedDealId: { type: String },
+    relatedTransactionId: { type: String },
+    sayadiID: { type: String },
     actions: [
       {
         actionType: { type: String },

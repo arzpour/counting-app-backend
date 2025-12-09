@@ -1,7 +1,8 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 import bcrypt from "bcryptjs";
 
 export interface IUser extends Document {
+  _id: Types.ObjectId;
   username: string;
   password: string;
   role: "accountant" | "secretary";
@@ -43,4 +44,3 @@ userSchema.methods.comparePassword = async function (
 
 const User = mongoose.model<IUser>("User", userSchema, "users");
 export default User;
-

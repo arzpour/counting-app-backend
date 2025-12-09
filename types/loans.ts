@@ -3,9 +3,9 @@ import { Types } from "mongoose";
 export interface ILoan {
   _id: Types.ObjectId;
   borrower: {
-    personId: number;
+    personId: string;
     fullName: string;
-    nationalId: number;
+    nationalId: string;
   };
   totalAmount: number;
   loanDate: string;
@@ -19,7 +19,7 @@ export interface ILoan {
     amount: number;
     status: string;
     paymentDate: string;
-    relatedSalaryPaymentId: number;
+    relatedSalaryPaymentId: string;
   }[];
   createdAt: string;
   updatedAt: string;

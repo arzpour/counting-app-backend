@@ -1,19 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../models/user";
-// import jwt from "jsonwebtoken";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 interface SignTokenResult {
   accessToken: string;
 }
 
 const signToken = (id: string): SignTokenResult => {
+  const expiresIn = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || "7d";
+
   const accessToken = jwt.sign(
     { id },
     process.env.JWT_ACCESS_TOKEN_SECRET as string,
-    {
-      expiresIn: Number(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN),
-    }
+    { expiresIn } as any
   );
 
   return { accessToken };
@@ -24,12 +23,12 @@ export const generateAccessToken = (
   res: Response,
   next: NextFunction
 ): void => {
+  const expiresIn = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || "7d";
+
   const accessToken = jwt.sign(
     { id: (req as any).userId },
     process.env.JWT_ACCESS_TOKEN_SECRET as string,
-    {
-      expiresIn: Number(process.env.JWT_ACCESS_TOKEN_EXPIRES_IN),
-    }
+    { expiresIn } as any
   );
 
   res.status(200).json({
@@ -47,8 +46,17 @@ export const login = async (
     const { username, password } = req.body;
 
     const user = await User.findOne({ username }).select("+password");
+    console.log("🚀 ~ login ~ user:", user);
 
     if (!user) {
+      res.status(401).json({ message: "incorrect username or password" });
+      return;
+    }
+
+    // Check if password is correct
+    const isPasswordCorrect = await user.comparePassword(password);
+    console.log("🚀 ~ login ~ isPasswordCorrect:", isPasswordCorrect)
+    if (!isPasswordCorrect) {
       res.status(401).json({ message: "incorrect username or password" });
       return;
     }

@@ -42,10 +42,15 @@ router.get("/vehicle/:vehicleId", async (req: Request, res: Response) => {
 // GET deals by VIN
 router.get("/vin/:vin", async (req: Request, res: Response) => {
   try {
-    const deals = await Deal.find({ "vehicleSnapshot.vin": req.params.vin });
+    const { vin } = req.params;
+    console.log(`🔍 Fetching deals for VIN: ${vin}`);
+
+    const deals = await Deal.find({ "vehicleSnapshot.vin": vin });
+    console.log(`✅ Found ${deals.length} deals for VIN: ${vin}`);
+
     res.json(deals);
   } catch (error) {
-    console.error("Error fetching deals:", error);
+    console.error("❌ Error fetching deals by VIN:", error);
     res.status(500).json({ error: "Error fetching deals" });
   }
 });
@@ -94,9 +99,9 @@ router.post("/", async (req: Request, res: Response) => {
     res.status(201).json(savedDeal);
   } catch (error: any) {
     console.error("Error creating deal:", error);
-    res.status(500).json({ 
-      error: "Error creating deal", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error creating deal",
+      details: error.message,
     });
   }
 });
@@ -115,9 +120,9 @@ router.put("/id/:id", async (req: Request, res: Response) => {
     res.json(updatedDeal);
   } catch (error: any) {
     console.error("Error updating deal:", error);
-    res.status(500).json({ 
-      error: "Error updating deal", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error updating deal",
+      details: error.message,
     });
   }
 });
@@ -137,4 +142,3 @@ router.delete("/id/:id", async (req: Request, res: Response) => {
 });
 
 export default router;
-

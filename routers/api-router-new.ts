@@ -1,6 +1,5 @@
 import express, { Router } from "express";
 // Import all routers
-import authRouter from "./auth";
 import vehiclesRouter from "./vehicles";
 import dealsRouter from "./deals";
 import peopleRouter from "./people";
@@ -11,6 +10,7 @@ import salariesRouter from "./salaries";
 import expensesRouter from "./expenses";
 import loansRouter from "./loans";
 import settingsRouter from "./settings";
+import authRouter from "./auth";
 
 const router: Router = express.Router();
 
@@ -28,6 +28,6 @@ router.use("/salaries", salariesRouter);
 router.use("/expenses", expensesRouter);
 router.use("/loans", loansRouter);
 router.use("/settings", settingsRouter);
+router.use("/auth", authRouter);
 
 export default router;
-

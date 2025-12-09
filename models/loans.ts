@@ -6,9 +6,9 @@ export interface ILoanDoc extends Document, Omit<ILoan, "_id"> {}
 const loanSchema = new Schema<ILoanDoc>(
   {
     borrower: {
-      personId: { type: Number, required: true },
+      personId: { type: String, required: true },
       fullName: { type: String, required: true },
-      nationalId: { type: Number, required: true },
+      nationalId: { type: String, required: true },
     },
     totalAmount: { type: Number, required: true },
     loanDate: { type: String, required: true },
@@ -23,7 +23,7 @@ const loanSchema = new Schema<ILoanDoc>(
         amount: { type: Number, required: true },
         status: { type: String, required: true },
         paymentDate: { type: String },
-        relatedSalaryPaymentId: { type: Number },
+        relatedSalaryPaymentId: { type: String },
       },
     ],
   },
