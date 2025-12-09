@@ -1,7 +1,15 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { IVehicle } from "../types/vehicles";
+import mongoose, { Schema } from "mongoose";
 
-export interface IVehicleDoc extends Document, Omit<IVehicle, "_id"> {}
+interface IVehicleDoc {
+  vin: string;
+  model: string;
+  productionYear: number;
+  plateNumber?: string;
+  color?: string;
+  dealHistoryIds?: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
 const vehicleSchema = new Schema<IVehicleDoc>(
   {
