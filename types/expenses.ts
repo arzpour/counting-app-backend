@@ -7,7 +7,7 @@ export interface IExpense {
   expenseDate: string;
   description: string;
   recipientPersonId: string;
-  transactionId: number;
+  transactionId: string;
   createdAt: string;
   updatedAt: string;
 }
