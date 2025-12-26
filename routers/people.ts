@@ -1,5 +1,6 @@
 import express, { Request, Response, Router } from "express";
 import People from "../models/people";
+import User from "../models/user";
 
 const router: Router = express.Router();
 
@@ -57,7 +58,10 @@ router.get("/role/:role", async (req: Request, res: Response) => {
 router.get("/search/:name", async (req: Request, res: Response) => {
   try {
     const people = await People.find({
-      fullName: { $regex: req.params.name, $options: "i" },
+      $or: [
+        { firstName: { $regex: req.params.name, $options: "i" } },
+        { lastName: { $regex: req.params.name, $options: "i" } },
+      ],
     });
     res.json(people);
   } catch (error) {
@@ -69,14 +73,33 @@ router.get("/search/:name", async (req: Request, res: Response) => {
 // POST create new person
 router.post("/", async (req: Request, res: Response) => {
   try {
+    const userId = (req as any).userId;
+    if (userId) {
+      const user = await User.findById(userId);
+      if (user && user.role === "secretary") {
+        if (req.body.roles && Array.isArray(req.body.roles)) {
+          const hasNonCustomerRole = req.body.roles.some(
+            (role: string) => role !== "customer"
+          );
+          if (hasNonCustomerRole) {
+            return res.status(403).json({
+              error: "Secretary can only create people with customer role",
+            });
+          }
+        } else {
+          req.body.roles = ["customer"];
+        }
+      }
+    }
+
     const newPerson = new People(req.body);
     const savedPerson = await newPerson.save();
     res.status(201).json(savedPerson);
   } catch (error: any) {
     console.error("Error creating person:", error);
-    res.status(500).json({ 
-      error: "Error creating person", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error creating person",
+      details: error.message,
     });
   }
 });
@@ -84,6 +107,25 @@ router.post("/", async (req: Request, res: Response) => {
 // PUT update person by ID
 router.put("/id/:id", async (req: Request, res: Response) => {
   try {
+    const userId = (req as any).userId;
+    if (userId) {
+      const user = await User.findById(userId);
+      if (user && user.role === "secretary") {
+        if (req.body.roles && Array.isArray(req.body.roles)) {
+          const hasNonCustomerRole = req.body.roles.some(
+            (role: string) => role !== "customer"
+          );
+          if (hasNonCustomerRole) {
+            return res.status(403).json({
+              error: "Secretary can only set people to customer role",
+            });
+          }
+        } else if (req.body.roles !== undefined) {
+          req.body.roles = ["customer"];
+        }
+      }
+    }
+
     const updatedPerson = await People.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
@@ -95,9 +137,9 @@ router.put("/id/:id", async (req: Request, res: Response) => {
     res.json(updatedPerson);
   } catch (error: any) {
     console.error("Error updating person:", error);
-    res.status(500).json({ 
-      error: "Error updating person", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error updating person",
+      details: error.message,
     });
   }
 });
@@ -107,7 +149,7 @@ router.put("/id/:id/wallet", async (req: Request, res: Response) => {
   try {
     const { amount, type, description } = req.body;
     const person = await People.findById(req.params.id);
-    
+
     if (!person) {
       return res.status(404).json({ error: "Person not found" });
     }
@@ -128,9 +170,9 @@ router.put("/id/:id/wallet", async (req: Request, res: Response) => {
     res.json(person);
   } catch (error: any) {
     console.error("Error updating wallet:", error);
-    res.status(500).json({ 
-      error: "Error updating wallet", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error updating wallet",
+      details: error.message,
     });
   }
 });
@@ -150,4 +192,3 @@ router.delete("/id/:id", async (req: Request, res: Response) => {
 });
 
 export default router;
-

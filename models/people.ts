@@ -5,9 +5,12 @@ export interface IPeopleDoc extends Document, Omit<IPeople, "_id"> {}
 
 const peopleSchema = new Schema<IPeopleDoc>(
   {
-    fullName: { type: String, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    fatherName: { type: String },
+    idNumber: { type: String },
     nationalId: { type: Number, required: true, unique: true },
-    phoneNumber: { type: Number },
+    phoneNumbers: [{ type: Number }],
     address: { type: String },
     roles: [{ type: String }],
     brokerDetails: {
@@ -48,4 +51,3 @@ const peopleSchema = new Schema<IPeopleDoc>(
 
 const People = mongoose.model<IPeopleDoc>("People", peopleSchema, "people");
 export default People;
-
