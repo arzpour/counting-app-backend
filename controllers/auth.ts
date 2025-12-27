@@ -8,10 +8,15 @@ interface SignTokenResult {
 
 const signToken = (id: string): SignTokenResult => {
   const expiresIn = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || "7d";
+  const secret = process.env.JWT_ACCESS_TOKEN_SECRET;
+
+  if (!secret) {
+    throw new Error("JWT_ACCESS_TOKEN_SECRET is not configured");
+  }
 
   const accessToken = jwt.sign(
     { id },
-    process.env.JWT_ACCESS_TOKEN_SECRET as string,
+    secret,
     { expiresIn } as any
   );
 
@@ -23,18 +28,27 @@ export const generateAccessToken = (
   res: Response,
   next: NextFunction
 ): void => {
-  const expiresIn = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || "7d";
+  try {
+    const expiresIn = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN || "7d";
+    const secret = process.env.JWT_ACCESS_TOKEN_SECRET;
 
-  const accessToken = jwt.sign(
-    { id: (req as any).userId },
-    process.env.JWT_ACCESS_TOKEN_SECRET as string,
-    { expiresIn } as any
-  );
+    if (!secret) {
+      throw new Error("JWT_ACCESS_TOKEN_SECRET is not configured");
+    }
 
-  res.status(200).json({
-    status: "success",
-    token: { accessToken },
-  });
+    const accessToken = jwt.sign(
+      { id: (req as any).userId },
+      secret,
+      { expiresIn } as any
+    );
+
+    res.status(200).json({
+      status: "success",
+      token: { accessToken },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const login = async (
@@ -43,13 +57,29 @@ export const login = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    // Check if JWT secret is configured
+    if (!process.env.JWT_ACCESS_TOKEN_SECRET) {
+      throw new Error("JWT_ACCESS_TOKEN_SECRET is not configured");
+    }
+
     const { username, password } = req.body;
+
+    if (!username || !password) {
+      res.status(400).json({ 
+        status: "error",
+        message: "Username and password are required" 
+      });
+      return;
+    }
 
     const user = await User.findOne({ username }).select("+password");
     console.log("🚀 ~ login ~ user:", user);
 
     if (!user) {
-      res.status(401).json({ message: "incorrect username or password" });
+      res.status(401).json({ 
+        status: "error",
+        message: "incorrect username or password" 
+      });
       return;
     }
 
@@ -57,20 +87,26 @@ export const login = async (
     const isPasswordCorrect = await user.comparePassword(password);
     console.log("🚀 ~ login ~ isPasswordCorrect:", isPasswordCorrect)
     if (!isPasswordCorrect) {
-      res.status(401).json({ message: "incorrect username or password" });
+      res.status(401).json({ 
+        status: "error",
+        message: "incorrect username or password" 
+      });
       return;
     }
 
     const { accessToken } = signToken(user._id.toString());
 
-    await user.save({ validateBeforeSave: false });
+    // Remove password from user object before sending response
+    const userObject = user.toObject();
+    delete userObject.password;
 
     res.status(200).json({
       status: "success",
       token: { accessToken },
-      data: { user },
+      data: { user: userObject },
     });
   } catch (error) {
+    console.error("Login error:", error);
     next(error);
   }
 };

@@ -29,10 +29,18 @@ const userSchema = new Schema<IUser>({
   },
 });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+userSchema.pre("save", async function (next: any) {
+  // Only hash password if it has been modified (or is new)
+  if (!this.isModified("password")) {
+    return typeof next === "function" ? next() : undefined;
+  }
+
+  try {
+    this.password = await bcrypt.hash(this.password, 10);
+    return typeof next === "function" ? next() : undefined;
+  } catch (error: any) {
+    return typeof next === "function" ? next(error) : Promise.reject(error);
+  }
 });
 
 // compare hash and plain password

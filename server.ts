@@ -27,6 +27,49 @@ app.get("/", (req, res) => {
   });
 });
 
+// Error handling middleware (must be after all routes)
+app.use((err: any, req: Request, res: Response, next: any) => {
+  console.error("Error:", err);
+  
+  // JWT errors
+  if (err.name === "JsonWebTokenError") {
+    return res.status(401).json({
+      status: "error",
+      message: "Invalid token",
+    });
+  }
+  
+  if (err.name === "TokenExpiredError") {
+    return res.status(401).json({
+      status: "error",
+      message: "Token expired",
+    });
+  }
+  
+  // Validation errors
+  if (err.isJoi) {
+    return res.status(400).json({
+      status: "error",
+      message: "Validation error",
+      details: err.details.map((detail: any) => detail.message),
+    });
+  }
+  
+  // Mongoose errors
+  if (err.name === "MongoError" || err.name === "MongoServerError") {
+    return res.status(500).json({
+      status: "error",
+      message: "Database error",
+    });
+  }
+  
+  // Default error
+  res.status(err.status || 500).json({
+    status: "error",
+    message: err.message || "Internal server error",
+  });
+});
+
 const PORT = parseInt(process.env.PORT || "3000", 10);
 const HOST = process.env.HOST || "localhost";
 
