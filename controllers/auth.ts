@@ -65,9 +65,9 @@ export const login = async (
     const { username, password } = req.body;
 
     if (!username || !password) {
-      res.status(400).json({ 
+      res.status(400).json({
         status: "error",
-        message: "Username and password are required" 
+        message: "Username and password are required"
       });
       return;
     }
@@ -76,9 +76,9 @@ export const login = async (
     console.log("🚀 ~ login ~ user:", user);
 
     if (!user) {
-      res.status(401).json({ 
+      res.status(401).json({
         status: "error",
-        message: "incorrect username or password" 
+        message: "incorrect username or password"
       });
       return;
     }
@@ -87,9 +87,9 @@ export const login = async (
     const isPasswordCorrect = await user.comparePassword(password);
     console.log("🚀 ~ login ~ isPasswordCorrect:", isPasswordCorrect)
     if (!isPasswordCorrect) {
-      res.status(401).json({ 
+      res.status(401).json({
         status: "error",
-        message: "incorrect username or password" 
+        message: "incorrect username or password"
       });
       return;
     }
@@ -98,12 +98,12 @@ export const login = async (
 
     // Remove password from user object before sending response
     const userObject = user.toObject();
-    delete userObject.password;
+    const { password: _, ...userWithoutPassword } = userObject;
 
     res.status(200).json({
       status: "success",
       token: { accessToken },
-      data: { user: userObject },
+      data: { user: userWithoutPassword },
     });
   } catch (error) {
     console.error("Login error:", error);
