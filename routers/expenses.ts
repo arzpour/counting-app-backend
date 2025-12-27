@@ -56,8 +56,8 @@ router.get("/date-range", async (req: Request, res: Response) => {
     const { startDate, endDate } = req.query;
     const expenses = await Expense.find({
       expenseDate: {
-        $gte: startDate,
-        $lte: endDate,
+        $gte: String(startDate),
+        $lte: String(endDate),
       },
     });
     res.json(expenses);
@@ -75,9 +75,9 @@ router.post("/", async (req: Request, res: Response) => {
     res.status(201).json(savedExpense);
   } catch (error: any) {
     console.error("Error creating expense:", error);
-    res.status(500).json({ 
-      error: "Error creating expense", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error creating expense",
+      details: error.message
     });
   }
 });
@@ -96,9 +96,9 @@ router.put("/id/:id", async (req: Request, res: Response) => {
     res.json(updatedExpense);
   } catch (error: any) {
     console.error("Error updating expense:", error);
-    res.status(500).json({ 
-      error: "Error updating expense", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error updating expense",
+      details: error.message
     });
   }
 });
@@ -110,9 +110,9 @@ router.delete("/id/:id", async (req: Request, res: Response) => {
     if (!deletedExpense) {
       return res.status(404).json({ error: "Expense not found" });
     }
-    res.json({ 
-      message: "Expense deleted successfully", 
-      expense: deletedExpense 
+    res.json({
+      message: "Expense deleted successfully",
+      expense: deletedExpense
     });
   } catch (error) {
     console.error("Error deleting expense:", error);

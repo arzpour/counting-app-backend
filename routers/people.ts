@@ -32,7 +32,7 @@ router.get("/id/:id", async (req: Request, res: Response) => {
 // GET person by national ID
 router.get("/national-id/:nationalId", async (req: Request, res: Response) => {
   try {
-    const person = await People.findOne({ nationalId: req.params.nationalId });
+    const person = await People.findOne({ nationalId: Number(req.params.nationalId) });
     if (!person) {
       return res.status(404).json({ error: "Person not found" });
     }

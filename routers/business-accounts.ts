@@ -42,8 +42,8 @@ router.get("/id/:id", async (req: Request, res: Response) => {
 // GET business account by account number
 router.get("/account-number/:accountNumber", async (req: Request, res: Response) => {
   try {
-    const account = await BusinessAccounts.findOne({ 
-      accountNumber: req.params.accountNumber 
+    const account = await BusinessAccounts.findOne({
+      accountNumber: Number(req.params.accountNumber)
     });
     if (!account) {
       return res.status(404).json({ error: "Business account not found" });
@@ -63,9 +63,9 @@ router.post("/", async (req: Request, res: Response) => {
     res.status(201).json(savedAccount);
   } catch (error: any) {
     console.error("Error creating business account:", error);
-    res.status(500).json({ 
-      error: "Error creating business account", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error creating business account",
+      details: error.message
     });
   }
 });
@@ -84,9 +84,9 @@ router.put("/id/:id", async (req: Request, res: Response) => {
     res.json(updatedAccount);
   } catch (error: any) {
     console.error("Error updating business account:", error);
-    res.status(500).json({ 
-      error: "Error updating business account", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error updating business account",
+      details: error.message
     });
   }
 });
@@ -96,7 +96,7 @@ router.put("/id/:id/balance", async (req: Request, res: Response) => {
   try {
     const { amount } = req.body;
     const account = await BusinessAccounts.findById(req.params.id);
-    
+
     if (!account) {
       return res.status(404).json({ error: "Business account not found" });
     }
@@ -107,9 +107,9 @@ router.put("/id/:id/balance", async (req: Request, res: Response) => {
     res.json(account);
   } catch (error: any) {
     console.error("Error updating balance:", error);
-    res.status(500).json({ 
-      error: "Error updating balance", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error updating balance",
+      details: error.message
     });
   }
 });
@@ -121,9 +121,9 @@ router.delete("/id/:id", async (req: Request, res: Response) => {
     if (!deletedAccount) {
       return res.status(404).json({ error: "Business account not found" });
     }
-    res.json({ 
-      message: "Business account deleted successfully", 
-      account: deletedAccount 
+    res.json({
+      message: "Business account deleted successfully",
+      account: deletedAccount
     });
   } catch (error) {
     console.error("Error deleting business account:", error);

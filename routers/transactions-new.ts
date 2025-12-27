@@ -82,8 +82,8 @@ router.get("/date-range", async (req: Request, res: Response) => {
     const { startDate, endDate } = req.query;
     const transactions = await Transaction.find({
       transactionDate: {
-        $gte: startDate,
-        $lte: endDate,
+        $gte: String(startDate),
+        $lte: String(endDate),
       },
     });
     res.json(transactions);

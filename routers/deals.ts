@@ -31,7 +31,7 @@ router.get("/id/:id", async (req: Request, res: Response) => {
 // GET deals by vehicle ID
 router.get("/vehicle/:vehicleId", async (req: Request, res: Response) => {
   try {
-    const deals = await Deal.find({ vehicleId: req.params.vehicleId });
+    const deals = await Deal.find({ vehicleId: Number(req.params.vehicleId) });
     res.json(deals);
   } catch (error) {
     console.error("Error fetching deals:", error);
