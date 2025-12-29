@@ -19,7 +19,6 @@ mongoose
 
 app.use("/api", apiRouters);
 
-// Add a test route to verify server is running
 app.get("/", (req, res) => {
   res.json({
     message: "Server is running!",
@@ -32,6 +31,4 @@ const HOST = process.env.HOST || "localhost";
 
 app.listen(PORT, HOST, () => {
   console.log(`🚀 Server running on port ${PORT} host ${HOST}`);
-  console.log(`📡 API available at http://${HOST}:${PORT}/api`);
-  console.log(`🔍 Test deals endpoint: http://${HOST}:${PORT}/api/deals`);
 });
