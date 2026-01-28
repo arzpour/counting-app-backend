@@ -43,7 +43,6 @@ router.get("/id/:id", async (req: Request, res: Response) => {
 router.get("/deal/:dealId", async (req: Request, res: Response) => {
   try {
     const cheques = await Cheque.find({ relatedDealId: req.params.dealId });
-    console.log("🚀 ~ cheques:", cheques);
     res.json(cheques);
   } catch (error) {
     console.error("Error fetching cheques:", error);

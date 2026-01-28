@@ -11,6 +11,7 @@ import expensesRouter from "./expenses";
 import loansRouter from "./loans";
 import settingsRouter from "./settings";
 import authRouter from "./auth";
+import usersRouter from "./users";
 
 const router: Router = express.Router();
 
@@ -29,5 +30,6 @@ router.use("/expenses", expensesRouter);
 router.use("/loans", loansRouter);
 router.use("/settings", settingsRouter);
 router.use("/auth", authRouter);
+router.use("/users", usersRouter);
 
 export default router;

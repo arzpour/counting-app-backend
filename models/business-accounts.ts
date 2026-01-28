@@ -8,7 +8,7 @@ const businessAccountsSchema = new Schema<IBusinessAccountsDoc>(
     accountName: { type: String, required: true },
     bankName: { type: String, required: true },
     branchName: { type: String },
-    accountNumber: { type: Number, required: true, unique: true },
+    accountNumber: { type: String, required: true, unique: true },
     iban: { type: String },
     cardNumber: { type: String },
     isActive: { type: Boolean, default: true },
