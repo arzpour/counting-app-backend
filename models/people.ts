@@ -10,6 +10,8 @@ const peopleSchema = new Schema<IPeopleDoc>(
     fatherName: { type: String },
     idNumber: { type: String },
     nationalId: { type: Number, required: true, unique: true },
+    postalCode: { type: String },
+    idCardNumber: { type: String },
     phoneNumbers: [{ type: Number }],
     address: { type: String },
     roles: [{ type: String }],
@@ -46,7 +48,7 @@ const peopleSchema = new Schema<IPeopleDoc>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const People = mongoose.model<IPeopleDoc>("People", peopleSchema, "people");

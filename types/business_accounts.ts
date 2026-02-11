@@ -5,7 +5,7 @@ export interface IBusinessAccounts {
   accountName: string;
   bankName: string;
   branchName: string;
-  accountNumber: number;
+  accountNumber: string;
   iban: string;
   cardNumber: string;
   isActive: boolean;

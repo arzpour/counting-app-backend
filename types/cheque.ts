@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 export interface ICheque {
   _id: Types.ObjectId;
   chequeNumber: number;
+  chequeSerial: string;
   bankName: string;
   branchName: string;
   issueDate: string;
@@ -11,6 +12,12 @@ export interface ICheque {
   type: string;
   status: string;
   vin: string;
+  description: string;
+  customer: {
+    personId: string;
+    fullName: string;
+    nationalId: string;
+  };
   payer: {
     personId: string;
     fullName: string;

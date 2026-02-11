@@ -7,6 +7,8 @@ export interface IPeople {
   fatherName?: string;
   idNumber?: string;
   nationalId: number;
+  postalCode: string;
+  idCardNumber: string;
   phoneNumbers: number[];
   address: string;
   roles: string[];
