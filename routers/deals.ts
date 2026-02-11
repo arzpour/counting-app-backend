@@ -43,7 +43,6 @@ router.get("/vehicle/:vehicleId", async (req: Request, res: Response) => {
 router.get("/vin/:vin", async (req: Request, res: Response) => {
   try {
     const { vin } = req.params;
-    console.log(`🔍 Fetching deals for VIN: ${vin}`);
 
     const deals = await Deal.find({ "vehicleSnapshot.vin": vin });
     console.log(`✅ Found ${deals.length} deals for VIN: ${vin}`);
