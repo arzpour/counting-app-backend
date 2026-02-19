@@ -5,7 +5,7 @@ export interface IChequeDoc extends Document, Omit<ICheque, "_id"> {}
 
 const chequeSchema = new Schema<IChequeDoc>(
   {
-    chequeNumber: { type: Number, required: true },
+    chequeNumber: { type: String, required: true },
     chequeSerial: { type: String, required: true },
     bankName: { type: String, required: true },
     branchName: { type: String },

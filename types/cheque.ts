@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 
 export interface ICheque {
   _id: Types.ObjectId;
-  chequeNumber: number;
+  chequeNumber: string;
   chequeSerial: string;
   bankName: string;
   branchName: string;

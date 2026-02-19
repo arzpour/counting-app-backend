@@ -55,7 +55,11 @@ router.get("/person/:personId", async (req: Request, res: Response) => {
   try {
     const { personId } = req.params;
     const cheques = await Cheque.find({
-      $or: [{ "payer.personId": personId }, { "payee.personId": personId }],
+      $or: [
+        { "payer.personId": personId },
+        { "payee.personId": personId },
+        { "customer.personId": personId },
+      ],
     });
 
     const issued = cheques.filter((c) => c.payer?.personId === personId);
@@ -92,11 +96,11 @@ router.get("/unpaid/deal/:dealId", async (req: Request, res: Response) => {
 
     const totalIssuedUnpaid = issued.reduce(
       (sum, c) => sum + (c.amount || 0),
-      0
+      0,
     );
     const totalReceivedUnpaid = received.reduce(
       (sum, c) => sum + (c.amount || 0),
-      0
+      0,
     );
 
     res.json({
@@ -133,7 +137,7 @@ router.put("/id/:id", async (req: Request, res: Response) => {
     const updatedCheque = await Cheque.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     if (!updatedCheque) {
       return res.status(404).json({ error: "Cheque not found" });

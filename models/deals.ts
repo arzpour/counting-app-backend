@@ -61,6 +61,11 @@ const dealSchema = new Schema<IDealDoc>(
           id: { type: String },
           category: { type: String },
           description: { type: String },
+           provider: {
+            personId: { type: String },
+            name: { type: String },
+          },
+          date: { type: String },
           cost: { type: Number },
         },
       ],
