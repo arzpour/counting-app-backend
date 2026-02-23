@@ -7,6 +7,10 @@ interface IVehicleDoc {
   plateNumber?: string;
   color?: string;
   dealHistoryIds?: string[];
+  SecretaryName?: string;
+  Secretary?: string;
+  DocumentsCopy?: string[];
+  documents?: "ناقص" | "کامل" | "فاقد مدارک";
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -19,6 +23,10 @@ const vehicleSchema = new Schema<IVehicleDoc>(
     plateNumber: { type: String },
     color: { type: String },
     dealHistoryIds: [{ type: String }],
+    SecretaryName: { type: String },
+    Secretary: { type: String },
+    DocumentsCopy: { type: [String] },
+    documents: { type: String, enum: ["ناقص", "کامل", "فاقد مدارک"] },
   },
   {
     timestamps: true,

@@ -50,9 +50,9 @@ router.post("/", async (req: Request, res: Response) => {
     res.status(201).json(savedVehicle);
   } catch (error: any) {
     console.error("Error creating vehicle:", error);
-    res.status(500).json({ 
-      error: "Error creating vehicle", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error creating vehicle",
+      details: error.message
     });
   }
 });
@@ -71,9 +71,9 @@ router.put("/id/:id", async (req: Request, res: Response) => {
     res.json(updatedVehicle);
   } catch (error: any) {
     console.error("Error updating vehicle:", error);
-    res.status(500).json({ 
-      error: "Error updating vehicle", 
-      details: error.message 
+    res.status(500).json({
+      error: "Error updating vehicle",
+      details: error.message
     });
   }
 });
