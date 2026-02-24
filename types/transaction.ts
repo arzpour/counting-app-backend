@@ -11,6 +11,8 @@ export interface ITransaction {
   dealId: string;
   bussinessAccountId: string;
   description: string;
+  providerPersonId: string;
+  brokerPersonId: string;
   createdAt: string;
   updatedAt: string;
 }
