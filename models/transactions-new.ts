@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { ITransaction } from "../types/transaction";
 
-export interface ITransactionDoc extends Document, Omit<ITransaction, "_id"> { }
+export interface ITransactionDoc extends Document, Omit<ITransaction, "_id"> {}
 
 const transactionSchema = new Schema<ITransactionDoc>(
   {
@@ -11,21 +11,24 @@ const transactionSchema = new Schema<ITransactionDoc>(
     reason: { type: String },
     paymentMethod: { type: String, required: true },
     personId: { type: String },
+    secondPersonId: { type: String },
     dealId: { type: String },
     bussinessAccountId: { type: String },
     description: { type: String },
     providerPersonId: { type: String },
     brokerPersonId: { type: String },
+    partnerPersonId: { type: String },
+    partnershipProfitSharePercentage: { type: String },
+    partnerShipProfit: { type: String },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Transaction = mongoose.model<ITransactionDoc>(
   "Transaction",
   transactionSchema,
-  "transactions"
+  "transactions",
 );
 export default Transaction;
-
