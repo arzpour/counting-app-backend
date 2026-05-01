@@ -46,25 +46,27 @@ const dealSchema = new Schema<IDealDoc>(
     directCosts: {
       options: [
         {
-          id: { type: String },
+          _id: { type: String },
           provider: {
             personId: { type: String },
             name: { type: String },
           },
           date: { type: String },
           description: { type: String },
-          cost: { type: Number },
+          cost: { type: String },
+          optionId: { type: String },
         },
       ],
       otherCost: [
         {
-          id: { type: String },
+          _id: { type: String },
           category: { type: String },
           description: { type: String },
-           provider: {
+          provider: {
             personId: { type: String },
             name: { type: String },
           },
+          optionId: { type: String },
           date: { type: String },
           cost: { type: Number },
         },
@@ -86,7 +88,7 @@ const dealSchema = new Schema<IDealDoc>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Deal = mongoose.model<IDealDoc>("Deal", dealSchema, "deals");

@@ -12,6 +12,8 @@ import loansRouter from "./loans";
 import settingsRouter from "./settings";
 import authRouter from "./auth";
 import usersRouter from "./users";
+import walletRouter from "./wallet";
+import exportToExcelRouter from "./exportToExcel";
 
 const router: Router = express.Router();
 
@@ -31,5 +33,7 @@ router.use("/loans", loansRouter);
 router.use("/settings", settingsRouter);
 router.use("/auth", authRouter);
 router.use("/users", usersRouter);
+router.use("/wallet", walletRouter);
+router.use("/exportToExcel", exportToExcelRouter);
 
 export default router;

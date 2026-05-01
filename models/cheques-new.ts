@@ -14,6 +14,7 @@ const chequeSchema = new Schema<IChequeDoc>(
     amount: { type: Number, required: true },
     type: { type: String, required: true },
     status: { type: String, required: true },
+    reason: { type: String },
     vin: { type: String },
     description: { type: String },
     customer: {
@@ -33,7 +34,7 @@ const chequeSchema = new Schema<IChequeDoc>(
     },
     relatedDealId: { type: String },
     relatedTransactionId: { type: String },
-    sayadiID: { type: String },
+    sayadiID: { type: String, required: true, unique: true },
     actions: [
       {
         actionType: { type: String },

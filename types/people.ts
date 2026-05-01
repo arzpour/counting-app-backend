@@ -36,6 +36,10 @@ export interface IPeople {
       type: string;
       description: string;
       date: string;
+      dealID: string;
+      transactionID: string;
+      optionId?: string;
+      chequeId?: string;
     }[];
   };
 }

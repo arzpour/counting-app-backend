@@ -3,6 +3,7 @@ import express, { Express, Request, Response } from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import apiRouters from "./routers/api-router-new";
+import Vehicle from "./models/vehicles";
 
 dotenv.config();
 
@@ -14,8 +15,12 @@ mongoose
   .connect(process.env.MONGO_URI as string, {
     dbName: "importDB",
   })
-  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .then(() => {console.log("✅ Connected to MongoDB Atlas");
+    // Vehicle.dropIndexes()
+  })
   .catch((err: Error) => console.error("❌ MongoDB Connection Error:", err));
+
+// db.vehicles.dropIndexes()
 
 app.use("/api", apiRouters);
 

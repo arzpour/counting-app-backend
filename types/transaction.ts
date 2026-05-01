@@ -9,7 +9,10 @@ export interface ITransaction {
   paymentMethod: string;
   personId: string;
   secondPersonId: string;
+  secondDealId: string;
   dealId: string;
+  vin: string;
+  secondVin: string;
   bussinessAccountId: string;
   description: string;
   providerPersonId: string;
@@ -17,6 +20,10 @@ export interface ITransaction {
   partnerPersonId: string;
   partnerShipProfit: string;
   partnershipProfitSharePercentage: string;
+  isBetweenTwoPerson?: boolean;
+  pairGroupId?: string;
+  profitState?: string;
+   role?:  string;
   createdAt: string;
   updatedAt: string;
 }

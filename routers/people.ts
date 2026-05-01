@@ -79,7 +79,7 @@ router.post("/", async (req: Request, res: Response) => {
       if (user && user.role === "secretary") {
         if (req.body.roles && Array.isArray(req.body.roles)) {
           const hasNonCustomerRole = req.body.roles.some(
-            (role: string) => role !== "customer"
+            (role: string) => role !== "customer",
           );
           if (hasNonCustomerRole) {
             return res.status(403).json({
@@ -113,7 +113,7 @@ router.put("/id/:id", async (req: Request, res: Response) => {
       if (user && user.role === "secretary") {
         if (req.body.roles && Array.isArray(req.body.roles)) {
           const hasNonCustomerRole = req.body.roles.some(
-            (role: string) => role !== "customer"
+            (role: string) => role !== "customer",
           );
           if (hasNonCustomerRole) {
             return res.status(403).json({
@@ -129,7 +129,7 @@ router.put("/id/:id", async (req: Request, res: Response) => {
     const updatedPerson = await People.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     if (!updatedPerson) {
       return res.status(404).json({ error: "Person not found" });
@@ -145,26 +145,233 @@ router.put("/id/:id", async (req: Request, res: Response) => {
 });
 
 // PUT update wallet balance
+// router.put("/id/:id/wallet", async (req: Request, res: Response) => {
+//   try {
+//     const { amount, type, description, dealID, transactionID, optionId } =
+//       req.body;
+//     const person = await People.findById(req.params.id);
+
+//     if (!person) {
+//       return res.status(404).json({ error: "Person not found" });
+//     }
+
+//     const transaction = {
+//       amount,
+//       type,
+//       description,
+//       dealID,
+//       transactionID,
+//       optionId,
+//       date: new Date().toISOString(),
+//     };
+
+//     person.wallet = person.wallet || { balance: 0, transactions: [] };
+//     // person.wallet.transactions = person.wallet.transactions || [];
+//     // person.wallet.transactions.push(transaction);
+
+//     console.log(
+//       `🚀 ~ description === "هزینه خودرو options" && !!optionId:`,
+//       description === "هزینه خودرو options" && !!optionId,
+//     );
+//     if (type === "هزینه خودرو options" && !!optionId) {
+//       person.wallet.transactions = person.wallet.transactions.map((t) => {
+//         if (t.optionId === optionId) {
+//           return { ...t, amount: amount };
+//         }
+//         return t;
+//       });
+//       person.wallet.balance = person.wallet.transactions.reduce(
+//         (sum, t) => sum + t.amount,
+//         0,
+//       );
+//     } else {
+//       person.wallet.balance = (person.wallet.balance || 0) + amount;
+//       person.wallet.transactions = person.wallet.transactions || [];
+//       person.wallet.transactions.push(transaction);
+//     }
+
+//     await person.save();
+//     res.json(person);
+//   } catch (error: any) {
+//     console.error("Error updating wallet:", error);
+//     res.status(500).json({
+//       error: "Error updating wallet",
+//       details: error.message,
+//     });
+//   }
+// });
+
+// PUT update wallet balance
+// router.put("/id/:id/wallet", async (req: Request, res: Response) => {
+//   try {
+//     const { amount, type, description, dealID, transactionID, optionId } =
+//       req.body;
+//     const person = await People.findById(req.params.id);
+//     if (!person) {
+//       return res.status(404).json({ error: "Person not found" });
+//     }
+
+//     person.wallet = person.wallet || { balance: 0, transactions: [] };
+
+//     const newTransaction = {
+//       amount,
+//       type,
+//       description,
+//       dealID,
+//       transactionID,
+//       optionId,
+//       date: new Date().toISOString(),
+//     };
+
+//     if (type === "هزینه خودرو options") {
+//       let transactionFound = false;
+
+//       person.wallet.transactions = person.wallet.transactions.map((t) => {
+//         if (optionId && String(t.optionId) === String(optionId)) {
+//           transactionFound = true;
+//           return { ...t, amount: amount };
+//         }
+//         if (!optionId && t.dealID === dealID && t.description === description) {
+//           transactionFound = true;
+//           return { ...t, amount: amount, optionId: optionId };
+//         }
+//         return t;
+//       });
+
+//       if (!transactionFound) {
+//         person.wallet.transactions.push(newTransaction);
+//       }
+
+//       person.wallet.balance = person.wallet.transactions.reduce(
+//         (sum, t) => sum + t.amount,
+//         0,
+//       );
+//     } else {
+//       person.wallet.transactions.push(newTransaction);
+//       person.wallet.balance = (person.wallet.balance || 0) + amount;
+//     }
+
+//     await person.save();
+//     res.json(person);
+//   } catch (error: any) {
+//     console.error("Error updating wallet:", error);
+//     res.status(500).json({
+//       error: "Error updating wallet",
+//       details: error.message,
+//     });
+//   }
+// });
+
+// PUT update wallet balance
 router.put("/id/:id/wallet", async (req: Request, res: Response) => {
   try {
-    const { amount, type, description } = req.body;
-    const person = await People.findById(req.params.id);
-
-    if (!person) {
-      return res.status(404).json({ error: "Person not found" });
-    }
-
-    const transaction = {
+    const {
       amount,
       type,
       description,
+      dealID,
+      transactionID,
+      optionId,
+      chequeId,
+    } = req.body;
+    const person = await People.findById(req.params.id);
+    if (!person) {
+      return res.status(404).json({ error: "Person not found" });
+    }
+    person.wallet = person.wallet || { balance: 0, transactions: [] };
+
+    const newTransaction = {
+      amount,
+      type,
+      description,
+      dealID,
+      transactionID,
+      optionId,
+      chequeId,
       date: new Date().toISOString(),
     };
 
-    person.wallet = person.wallet || { balance: 0, transactions: [] };
-    person.wallet.balance = (person.wallet.balance || 0) + amount;
-    person.wallet.transactions = person.wallet.transactions || [];
-    person.wallet.transactions.push(transaction);
+    let transactionFound = false;
+
+    person.wallet.transactions = person.wallet.transactions.map((t) => {
+      if (chequeId && t.chequeId === chequeId) {
+        transactionFound = true;
+        return { ...t, amount: amount, description: description, type: type };
+      }
+
+      if (transactionID && t.transactionID === transactionID) {
+        transactionFound = true;
+        return { ...t, amount: amount, description: description, type: type };
+      }
+
+      if (
+        type === "هزینه خودرو options" &&
+        optionId &&
+        String(t.optionId) === String(optionId)
+      ) {
+        transactionFound = true;
+        return { ...t, amount: amount };
+      }
+
+      if (
+        type === "هزینه خودرو options" &&
+        !optionId &&
+        t.dealID === dealID &&
+        t.description === description
+      ) {
+        transactionFound = true;
+        return { ...t, amount: amount, optionId: optionId };
+      }
+
+      return t;
+    });
+
+    if (!transactionFound) {
+      person.wallet.transactions.push(newTransaction);
+    }
+
+    // if (chequeId) {
+    //   person.wallet.transactions.push(newTransaction);
+    // } else {
+    //   let transactionFound = false;
+
+    //   person.wallet.transactions = person.wallet.transactions.map((t) => {
+    //     if (transactionID && t.transactionID === transactionID) {
+    //       transactionFound = true;
+    //       return { ...t, amount: amount, description: description, type: type };
+    //     }
+
+    //     if (
+    //       type === "هزینه خودرو options" &&
+    //       optionId &&
+    //       String(t.optionId) === String(optionId)
+    //     ) {
+    //       transactionFound = true;
+    //       return { ...t, amount: amount };
+    //     }
+
+    //     if (
+    //       type === "هزینه خودرو options" &&
+    //       !optionId &&
+    //       t.dealID === dealID &&
+    //       t.description === description
+    //     ) {
+    //       transactionFound = true;
+    //       return { ...t, amount: amount, optionId: optionId };
+    //     }
+
+    //     return t;
+    //   });
+
+    //   if (!transactionFound) {
+    //     person.wallet.transactions.push(newTransaction);
+    //   }
+    // }
+
+    person.wallet.balance = person.wallet.transactions.reduce(
+      (sum, t) => sum + t.amount,
+      0,
+    );
 
     await person.save();
     res.json(person);
@@ -172,6 +379,55 @@ router.put("/id/:id/wallet", async (req: Request, res: Response) => {
     console.error("Error updating wallet:", error);
     res.status(500).json({
       error: "Error updating wallet",
+      details: error.message,
+    });
+  }
+});
+
+// DELETE wallet
+router.put("/id/:id/wallet/delete", async (req: Request, res: Response) => {
+  try {
+    const { dealID, transactionID, optionId, chequeId } = req.body;
+    const person = await People.findById(req.params.id);
+
+    if (!person) {
+      return res.status(404).json({ error: "Person not found" });
+    }
+
+    if (!person.wallet) {
+      return res.status(400).json({ error: "Wallet not found" });
+    }
+
+    // person.wallet.transactions = person.wallet.transactions.filter(
+    //   (t) => t.dealID !== dealID && t.transactionID !== transactionID,
+    // );
+    person.wallet.transactions = person.wallet.transactions.filter(
+      (t) => t.transactionID !== transactionID,
+    );
+
+    if (optionId) {
+      person.wallet.transactions = person.wallet.transactions.filter(
+        (t) => t.optionId !== optionId,
+      );
+    }
+
+    if (chequeId) {
+      person.wallet.transactions = person.wallet.transactions.filter(
+        (t) => t.chequeId !== chequeId,
+      );
+    }
+
+    person.wallet.balance = person.wallet.transactions.reduce(
+      (acc, curr) => acc + curr.amount,
+      0,
+    );
+
+    await person.save();
+    res.json(person);
+  } catch (error: any) {
+    console.error("Error deleting transaction from wallet:", error);
+    res.status(500).json({
+      error: "Error deleting transaction from wallet",
       details: error.message,
     });
   }

@@ -1,11 +1,14 @@
 import mongoose, { Schema } from "mongoose";
 
+type VehicleStatus = "sold" | "in_stock";
+
 interface IVehicleDoc {
   vin: string;
   model: string;
   productionYear: number;
   plateNumber?: string;
   color?: string;
+  status: VehicleStatus;
   dealHistoryIds?: string[];
   SecretaryName?: string;
   Secretary?: string;
@@ -17,11 +20,12 @@ interface IVehicleDoc {
 
 const vehicleSchema = new Schema<IVehicleDoc>(
   {
-    vin: { type: String, required: true, unique: true },
+    vin: { type: String, required: true },
     model: { type: String, required: true },
     productionYear: { type: Number, required: true },
-    plateNumber: { type: String },
+    plateNumber: { type: String, required: true, unique: true },
     color: { type: String },
+    status: { type: String, enum: ["sold", "in_stock"] as const },
     dealHistoryIds: [{ type: String }],
     SecretaryName: { type: String },
     Secretary: { type: String },
@@ -30,9 +34,12 @@ const vehicleSchema = new Schema<IVehicleDoc>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-const Vehicle = mongoose.model<IVehicleDoc>("Vehicle", vehicleSchema, "vehicles");
+const Vehicle = mongoose.model<IVehicleDoc>(
+  "Vehicle",
+  vehicleSchema,
+  "vehicles",
+);
 export default Vehicle;
-

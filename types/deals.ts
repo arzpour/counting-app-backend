@@ -42,20 +42,20 @@ export interface IDeal {
   commissionAmount: number;
   directCosts: {
     options: {
-      id: string;
+      _id: string;
       provider: {
         personId: string;
         name: string;
       };
       date: string;
       description: string;
-      cost: number;
+      cost: string;
     }[];
     otherCost: {
-      id: string;
+      _id: string;
       category: string;
       description: string;
-      cost: number;
+      cost: string;
     }[];
   };
   partnerships: {

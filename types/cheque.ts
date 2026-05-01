@@ -11,6 +11,7 @@ export interface ICheque {
   amount: number;
   type: string;
   status: string;
+  reason: string;
   vin: string;
   description: string;
   customer: {

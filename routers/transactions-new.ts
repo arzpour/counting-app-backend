@@ -114,7 +114,7 @@ router.put("/id/:id", async (req: Request, res: Response) => {
     const updatedTransaction = await Transaction.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     if (!updatedTransaction) {
       return res.status(404).json({ error: "Transaction not found" });
@@ -129,18 +129,40 @@ router.put("/id/:id", async (req: Request, res: Response) => {
   }
 });
 
+
 // DELETE transaction by ID
-router.delete("/id/:id", async (req: Request, res: Response) => {
+// router.delete("/id/:id", async (req: Request, res: Response) => {
+//   try {
+//     const deletedTransaction = await Transaction.findByIdAndDelete(
+//       req.params.id,
+//     );
+//     if (!deletedTransaction) {
+//       return res.status(404).json({ error: "Transaction not found" });
+//     }
+//     res.json({
+//       message: "Transaction deleted successfully",
+//       transaction: deletedTransaction,
+//     });
+//   } catch (error) {
+//     console.error("Error deleting transaction:", error);
+//     res.status(500).json({ error: "Error deleting transaction" });
+//   }
+// });
+
+router.delete("/id/:id", async (req, res) => {
   try {
-    const deletedTransaction = await Transaction.findByIdAndDelete(
-      req.params.id
-    );
-    if (!deletedTransaction) {
-      return res.status(404).json({ error: "Transaction not found" });
+    const base = await Transaction.findById(req.params.id);
+    if (!base) return res.status(404).json({ error: "Transaction not found" });
+
+    if (base.isBetweenTwoPerson && base.pairGroupId) {
+      await Transaction.deleteMany({ pairGroupId: base.pairGroupId });
+      return res.json({ message: "Both paired transactions deleted" });
     }
+
+    await Transaction.findByIdAndDelete(req.params.id);
     res.json({
       message: "Transaction deleted successfully",
-      transaction: deletedTransaction,
+      transaction: base,
     });
   } catch (error) {
     console.error("Error deleting transaction:", error);
