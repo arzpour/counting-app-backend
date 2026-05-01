@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 import { IPeople } from "../types/people";
 
 export interface IPeopleDoc extends Document, Omit<IPeople, "_id"> {}
@@ -45,7 +45,7 @@ const peopleSchema = new Schema<IPeopleDoc>(
           dealID: { type: String },
           transactionID: { type: String },
           optionId: { type: String },
-          chequeId:{ type: String },
+          chequeId: { type: String },
         },
       ],
     },
@@ -55,5 +55,11 @@ const peopleSchema = new Schema<IPeopleDoc>(
   },
 );
 
-const People = mongoose.model<IPeopleDoc>("People", peopleSchema, "people");
-export default People;
+export function getPeopleModel(db: any) {
+  if (!db) return null;
+  if (db.models?.People) return db.models.People;
+  return db.model("People", peopleSchema);
+}
+
+// const People = mongoose.model<IPeopleDoc>("People", peopleSchema, "people");
+// export default People;

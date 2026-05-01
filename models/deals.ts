@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 import { IDeal } from "../types/deals";
 
 export interface IDealDoc extends Document, Omit<IDeal, "_id"> {}
@@ -91,5 +91,11 @@ const dealSchema = new Schema<IDealDoc>(
   },
 );
 
-const Deal = mongoose.model<IDealDoc>("Deal", dealSchema, "deals");
-export default Deal;
+export function getDealModel(db: any) {
+  if (!db) return null;
+  if (db.models?.Deal) return db.models.Deal;
+  return db.model("Deal", dealSchema);
+}
+
+// const Deal = mongoose.model<IDealDoc>("Deal", dealSchema, "deals");
+// export default Deal;

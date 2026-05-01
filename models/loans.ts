@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 import { ILoan } from "../types/loans";
 
 export interface ILoanDoc extends Document, Omit<ILoan, "_id"> {}
@@ -29,8 +29,14 @@ const loanSchema = new Schema<ILoanDoc>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-const Loan = mongoose.model<ILoanDoc>("Loan", loanSchema, "loans");
-export default Loan;
+export function getLoanModel(db: any) {
+  if (!db) return null;
+  if (db.models?.Loan) return db.models.Loan;
+  return db.model("Loan", loanSchema);
+}
+
+// const Loan = mongoose.model<ILoanDoc>("Loan", loanSchema, "loans");
+// export default Loan;

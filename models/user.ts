@@ -11,7 +11,7 @@ export interface IUser extends Document {
   comparePassword(userPassword: string): Promise<boolean>;
 }
 
-const userSchema = new Schema<IUser>({
+export const userSchema = new Schema<IUser>({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: {
@@ -43,5 +43,11 @@ userSchema.methods.comparePassword = async function (
   return await bcrypt.compare(userPassword, this.password);
 };
 
-const User = mongoose.model<IUser>("User", userSchema, "users");
-export default User;
+export const User = mongoose.model<IUser>("User", userSchema, "users");
+// export default User;
+
+export function getUserModel(db: any) {
+  if (!db) return null;
+  if (db.models?.User) return db.models.User;
+  return db.model("User", userSchema);
+}

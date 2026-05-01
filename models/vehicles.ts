@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import { Schema } from "mongoose";
 
 type VehicleStatus = "sold" | "in_stock";
 
@@ -37,9 +37,15 @@ const vehicleSchema = new Schema<IVehicleDoc>(
   },
 );
 
-const Vehicle = mongoose.model<IVehicleDoc>(
-  "Vehicle",
-  vehicleSchema,
-  "vehicles",
-);
-export default Vehicle;
+export function getVehicleModel(db: any) {
+  if (!db) return null;
+  if (db.models?.Vehicle) return db.models.Vehicle;
+  return db.model("Vehicle", vehicleSchema);
+}
+
+// const Vehicle = mongoose.model<IVehicleDoc>(
+//   "Vehicle",
+//   vehicleSchema,
+//   "vehicles",
+// );
+// export default Vehicle;

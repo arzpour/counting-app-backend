@@ -1,24 +1,26 @@
 import dotenv from "dotenv";
-import express, { Express, Request, Response } from "express";
-import mongoose from "mongoose";
+import express, { Express } from "express";
+// import mongoose from "mongoose";
 import cors from "cors";
 import apiRouters from "./routers/api-router-new";
-import Vehicle from "./models/vehicles";
+import { authenticateJWT } from "./middleware/auth";
+import { attachDatabase } from "./db/connectToDB";
 
 dotenv.config();
 
 const app: Express = express();
 app.use(express.json());
 app.use(cors());
-
-mongoose
-  .connect(process.env.MONGO_URI as string, {
-    dbName: "importDB",
-  })
-  .then(() => {console.log("✅ Connected to MongoDB Atlas");
-    // Vehicle.dropIndexes()
-  })
-  .catch((err: Error) => console.error("❌ MongoDB Connection Error:", err));
+// app.use(authenticateJWT); // First authenticate
+// app.use(attachDatabase);
+// mongoose
+//   .connect(process.env.MONGO_URI as string, {
+//     dbName: "importDB",
+//   })
+//   .then(() => {console.log("✅ Connected to MongoDB Atlas");
+//     // Vehicle.dropIndexes()
+//   })
+//   .catch((err: Error) => console.error("❌ MongoDB Connection Error:", err));
 
 // db.vehicles.dropIndexes()
 

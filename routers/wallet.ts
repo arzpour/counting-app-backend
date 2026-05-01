@@ -64,7 +64,6 @@ router.post("/update-wallet-transfer", async (req: Request, res: Response) => {
         { _id: oldPersonId },
         { $set: { "wallet.balance": newBalance } },
       );
-      console.log(`✅ Transaction removed from old person: ${oldPersonId}`);
     } else {
       console.log(`⚠️ Transaction not found in old person's wallet`);
     }
@@ -97,7 +96,6 @@ router.post("/update-wallet-transfer", async (req: Request, res: Response) => {
             { $set: { "wallet.balance": newBalance } },
           );
         }
-        console.log(`✅ Transaction added to new person: ${newPersonId}`);
       }
     }
 

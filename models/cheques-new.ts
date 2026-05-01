@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 import { ICheque } from "../types/cheque";
 
 export interface IChequeDoc extends Document, Omit<ICheque, "_id"> {}
@@ -49,5 +49,11 @@ const chequeSchema = new Schema<IChequeDoc>(
   },
 );
 
-const Cheque = mongoose.model<IChequeDoc>("Cheque", chequeSchema, "cheques");
-export default Cheque;
+export function getChequeModel(db: any) {
+  if (!db) return null;
+  if (db.models?.Cheque) return db.models.Cheque;
+  return db.model("Cheque", chequeSchema);
+}
+
+// const Cheque = mongoose.model<IChequeDoc>("Cheque", chequeSchema, "cheques");
+// export default Cheque;

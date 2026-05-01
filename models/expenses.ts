@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 import { IExpense } from "../types/expenses";
 
 export interface IExpenseDoc extends Document, Omit<IExpense, "_id"> {}
@@ -14,12 +14,18 @@ const expenseSchema = new Schema<IExpenseDoc>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-const Expense = mongoose.model<IExpenseDoc>(
-  "Expense",
-  expenseSchema,
-  "expenses"
-);
-export default Expense;
+export function getExpenseModel(db: any) {
+  if (!db) return null;
+  if (db.models?.Expense) return db.models.Expense;
+  return db.model("Expense", expenseSchema);
+}
+
+// const Expense = mongoose.model<IExpenseDoc>(
+//   "Expense",
+//   expenseSchema,
+//   "expenses"
+// );
+// export default Expense;

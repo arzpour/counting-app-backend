@@ -23,7 +23,7 @@ export interface ITransaction {
   isBetweenTwoPerson?: boolean;
   pairGroupId?: string;
   profitState?: string;
-   role?:  string;
+  role?: string;
   createdAt: string;
   updatedAt: string;
 }

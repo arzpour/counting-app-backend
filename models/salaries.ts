@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 import { ISalaries } from "../types/salaries";
 
 export interface ISalariesDoc extends Document, Omit<ISalaries, "_id"> {}
@@ -45,9 +45,14 @@ const salariesSchema = new Schema<ISalariesDoc>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-const Salaries = mongoose.model<ISalariesDoc>("Salaries", salariesSchema, "salaries");
-export default Salaries;
+export function getSalariesModel(db: any) {
+  if (!db) return null;
+  if (db.models?.Salaries) return db.models.Salaries;
+  return db.model("Salaries", salariesSchema);
+}
 
+// const Salaries = mongoose.model<ISalariesDoc>("Salaries", salariesSchema, "salaries");
+// export default Salaries;

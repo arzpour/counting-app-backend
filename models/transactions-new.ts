@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 import { ITransaction } from "../types/transaction";
 
 export interface ITransactionDoc extends Document, Omit<ITransaction, "_id"> {}
@@ -33,9 +33,15 @@ const transactionSchema = new Schema<ITransactionDoc>(
   },
 );
 
-const Transaction = mongoose.model<ITransactionDoc>(
-  "Transaction",
-  transactionSchema,
-  "transactions",
-);
-export default Transaction;
+export function getTransactionModel(db: any) {
+  if (!db) return null;
+  if (db.models?.Transaction) return db.models.Transaction;
+  return db.model("Transaction", transactionSchema);
+}
+
+// const Transaction = mongoose.model<ITransactionDoc>(
+//   "Transaction",
+//   transactionSchema,
+//   "transactions",
+// );
+// export default Transaction;

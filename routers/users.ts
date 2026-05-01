@@ -1,12 +1,17 @@
 import express, { Request, Response, Router } from "express";
-import User from "../models/user";
+import { getUserModel } from "../models/user";
+import { AuthRequest } from "../types/db";
 
 const router: Router = express.Router();
 
 // GET all users
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", async (req: AuthRequest, res: Response) => {
   try {
-    const user = await User.find();
+    const UserModel = getUserModel(req.db);
+    if (!UserModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
+    const user = await UserModel.find();
     res.json(user);
   } catch (error) {
     console.error("Error fetching users:", error);

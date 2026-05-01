@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Setting from "../models/data-settings";
+import Setting from "../models/setting";
 
 // Get all categories and their options
 export const getAllSettings = async (

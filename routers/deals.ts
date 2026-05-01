@@ -1,13 +1,18 @@
 import express, { Request, Response, Router } from "express";
-import Deal from "../models/deals";
-import mongoose from "mongoose";
+// import Deal, { getDealModel } from "../models/deals";
+import { AuthRequest } from "../types/db";
+import { getDealModel } from "../models/deals";
 
 const router: Router = express.Router();
 
 // GET all deals
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", async (req: AuthRequest, res: Response) => {
   try {
-    const deals = await Deal.find();
+    const DealModel = getDealModel(req.db);
+    if (!DealModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
+    const deals = await DealModel.find();
     res.json(deals);
   } catch (error) {
     console.error("Error fetching deals:", error);
@@ -16,9 +21,13 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 // GET deal by ID
-router.get("/id/:id", async (req: Request, res: Response) => {
+router.get("/id/:id", async (req: AuthRequest, res: Response) => {
   try {
-    const deal = await Deal.findById(req.params.id);
+    const DealModel = getDealModel(req.db);
+    if (!DealModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
+    const deal = await DealModel.findById(req.params.id);
     if (!deal) {
       return res.status(404).json({ error: "Deal not found" });
     }
@@ -30,9 +39,13 @@ router.get("/id/:id", async (req: Request, res: Response) => {
 });
 
 // GET deals by vehicle ID
-router.get("/vehicle/:vehicleId", async (req: Request, res: Response) => {
+router.get("/vehicle/:vehicleId", async (req: AuthRequest, res: Response) => {
   try {
-    const deals = await Deal.find({ vehicleId: req.params.vehicleId });
+    const DealModel = getDealModel(req.db);
+    if (!DealModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
+    const deals = await DealModel.find({ vehicleId: req.params.vehicleId });
     res.json(deals);
   } catch (error) {
     console.error("Error fetching deals:", error);
@@ -41,12 +54,15 @@ router.get("/vehicle/:vehicleId", async (req: Request, res: Response) => {
 });
 
 // GET deals by VIN
-router.get("/vin/:vin", async (req: Request, res: Response) => {
+router.get("/vin/:vin", async (req: AuthRequest, res: Response) => {
   try {
+    const DealModel = getDealModel(req.db);
+    if (!DealModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
     const { vin } = req.params;
 
-    const deals = await Deal.find({ "vehicleSnapshot.vin": vin });
-    console.log(`✅ Found ${deals.length} deals for VIN: ${vin}`);
+    const deals = await DealModel.find({ "vehicleSnapshot.vin": vin });
 
     res.json(deals);
   } catch (error) {
@@ -56,10 +72,14 @@ router.get("/vin/:vin", async (req: Request, res: Response) => {
 });
 
 // GET deals by person (seller or buyer)
-router.get("/person/:personId", async (req: Request, res: Response) => {
+router.get("/person/:personId", async (req: AuthRequest, res: Response) => {
   try {
+    const DealModel = getDealModel(req.db);
+    if (!DealModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
     const { personId } = req.params;
-    const deals = await Deal.find({
+    const deals = await DealModel.find({
       $or: [
         { "seller.personId": personId },
         { "buyer.personId": personId },
@@ -81,9 +101,13 @@ router.get("/person/:personId", async (req: Request, res: Response) => {
 });
 
 // GET deals by status
-router.get("/status/:status", async (req: Request, res: Response) => {
+router.get("/status/:status", async (req: AuthRequest, res: Response) => {
   try {
-    const deals = await Deal.find({ status: req.params.status });
+    const DealModel = getDealModel(req.db);
+    if (!DealModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
+    const deals = await DealModel.find({ status: req.params.status });
     res.json(deals);
   } catch (error) {
     console.error("Error fetching deals:", error);
@@ -92,13 +116,14 @@ router.get("/status/:status", async (req: Request, res: Response) => {
 });
 
 // POST create new deal
-router.post("/", async (req: Request, res: Response) => {
+router.post("/", async (req: AuthRequest, res: Response) => {
   try {
-    const newDeal = new Deal(req.body);
-    console.log("🚀 ~ req.body:", req.body)
-    console.log("🚀 ~ newDeal:", newDeal)
+    const DealModel = getDealModel(req.db);
+    if (!DealModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
+    const newDeal = new DealModel(req.body);
     const savedDeal = await newDeal.save();
-    console.log("🚀 ~ savedDeal:", savedDeal)
     res.status(201).json(savedDeal);
   } catch (error: any) {
     console.error("Error creating deal:", error);
@@ -110,9 +135,13 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 // PUT update deal by ID
-router.put("/id/:id", async (req: Request, res: Response) => {
+router.put("/id/:id", async (req: AuthRequest, res: Response) => {
   try {
-    const updatedDeal = await Deal.findByIdAndUpdate(
+    const DealModel = getDealModel(req.db);
+    if (!DealModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
+    const updatedDeal = await DealModel.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
       { new: true, runValidators: true },
@@ -133,40 +162,36 @@ router.put("/id/:id", async (req: Request, res: Response) => {
 // PUT /api/deals/:dealId/option/:optionId
 router.put(
   "/:dealId/option/:optionId",
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const { dealId, optionId } = req.params;
-    // فرض بر این است که بدنه درخواست (req.body) شامل فیلدهای قابل تغییر است
-    // مثلا: { description: "توضیحات جدید", cost: 500000 }
     const updateData = req.body;
 
     try {
-      // استفاده از $set و نوتیشن دات برای آپدیت مستقیم آیتم داخل آرایه
-      // "directCosts.options.$" به مونگو می‌گوید که اولین آیتمی که شرط را دارد را پیدا کن و آپدیت کن
-      const updatedDeal = await Deal.findOneAndUpdate(
-        { 
-          _id: dealId, 
-          "directCosts.options._id": optionId // شرط: آیتمی با این ID پیدا کن
+      const DealModel = getDealModel(req.db);
+      if (!DealModel) {
+        return res.status(500).json({ error: "Deal model is not initialized" });
+      }
+      const updatedDeal = await DealModel.findOneAndUpdate(
+        {
+          _id: dealId,
+          "directCosts.options._id": optionId,
         },
-        { 
-          $set: { 
-            // اینجا فیلدهایی که می‌خواهید آپدیت شوند را لیست کنید
+        {
+          $set: {
             "directCosts.options.$.description": updateData.description,
             "directCosts.options.$.cost": updateData.cost,
             "directCosts.options.$.date": updateData.date,
-            // اگر provider هم آپدیت شود:
-            "directCosts.options.$.provider": updateData.provider
-          } 
+            "directCosts.options.$.provider": updateData.provider,
+          },
         },
-        { new: true } // برگرداندن داکیومنت بعد از آپدیت
+        { new: true },
       );
 
       if (!updatedDeal) {
         return res.status(404).json({ error: "Deal or Option not found" });
       }
 
-      console.log("✅ Option updated successfully");
       res.json(updatedDeal);
-
     } catch (error: any) {
       console.error("Error updating direct cost option:", error);
       res.status(500).json({
@@ -178,9 +203,13 @@ router.put(
 );
 
 // DELETE deal by ID
-router.delete("/id/:id", async (req: Request, res: Response) => {
+router.delete("/id/:id", async (req: AuthRequest, res: Response) => {
   try {
-    const deletedDeal = await Deal.findByIdAndDelete(req.params.id);
+    const DealModel = getDealModel(req.db);
+    if (!DealModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
+    const deletedDeal = await DealModel.findByIdAndDelete(req.params.id);
     if (!deletedDeal) {
       return res.status(404).json({ error: "Deal not found" });
     }
@@ -194,11 +223,15 @@ router.delete("/id/:id", async (req: Request, res: Response) => {
 // DELETE /api/deals/:dealId/option/:optionId
 router.delete(
   "/:dealId/option/:optionId",
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const { dealId, optionId } = req.params;
 
     try {
-      const deal = await Deal.findById(dealId);
+      const DealModel = getDealModel(req.db);
+      if (!DealModel) {
+        return res.status(500).json({ error: "Deal model is not initialized" });
+      }
+      const deal = await DealModel.findById(dealId);
 
       if (!deal) {
         return res.status(404).json({ error: "Deal not found" });
@@ -208,7 +241,7 @@ router.delete(
         (option) => option._id && option._id.toString() !== optionId,
       );
 
-      const updatedDeal = await Deal.findByIdAndUpdate(
+      const updatedDeal = await DealModel.findByIdAndUpdate(
         dealId,
         { $set: { "directCosts.options": updatedOptions } },
         { new: true },

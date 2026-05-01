@@ -14,26 +14,44 @@ import authRouter from "./auth";
 import usersRouter from "./users";
 import walletRouter from "./wallet";
 import exportToExcelRouter from "./exportToExcel";
+import { authenticateJWT } from "../middleware/auth";
+import { attachDatabase } from "../db/connectToDB";
 
 const router: Router = express.Router();
+
 
 // Authentication routes
 router.use("/auth", authRouter);
 
 // Main entity routes
-router.use("/vehicles", vehiclesRouter);
-router.use("/deals", dealsRouter);
-router.use("/people", peopleRouter);
-router.use("/cheques", chequesRouter);
-router.use("/transactions", transactionsRouter);
-router.use("/business-accounts", businessAccountsRouter);
-router.use("/salaries", salariesRouter);
-router.use("/expenses", expensesRouter);
-router.use("/loans", loansRouter);
-router.use("/settings", settingsRouter);
-router.use("/auth", authRouter);
+router.use("/vehicles", authenticateJWT, attachDatabase, vehiclesRouter);
+router.use("/deals", authenticateJWT, attachDatabase, dealsRouter);
+router.use("/people", authenticateJWT, attachDatabase, peopleRouter);
+router.use("/cheques", authenticateJWT, attachDatabase, chequesRouter);
+router.use(
+  "/transactions",
+  authenticateJWT,
+  attachDatabase,
+  transactionsRouter,
+);
+router.use(
+  "/business-accounts",
+  authenticateJWT,
+  attachDatabase,
+  businessAccountsRouter,
+);
+router.use("/salaries", authenticateJWT, attachDatabase, salariesRouter);
+router.use("/expenses", authenticateJWT, attachDatabase, expensesRouter);
+router.use("/loans", authenticateJWT, attachDatabase, loansRouter);
+router.use("/settings", authenticateJWT, attachDatabase, settingsRouter);
+// router.use("/auth", authRouter);
 router.use("/users", usersRouter);
-router.use("/wallet", walletRouter);
-router.use("/exportToExcel", exportToExcelRouter);
+router.use("/wallet", authenticateJWT, attachDatabase, walletRouter);
+router.use(
+  "/exportToExcel",
+  authenticateJWT,
+  attachDatabase,
+  exportToExcelRouter,
+);
 
 export default router;
