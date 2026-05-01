@@ -23,7 +23,6 @@ export const getAllVehicles = async (req: AuthRequest, res: Response) => {
   }
 };
 
-
 // GET vehicle by ID
 export const getVehicleById = async (req: AuthRequest, res: Response) => {
   try {
@@ -42,8 +41,7 @@ export const getVehicleById = async (req: AuthRequest, res: Response) => {
     console.error("Error fetching vehicle:", error);
     res.status(500).json({ error: "Error fetching vehicle" });
   }
-}
-
+};
 
 // GET vehicle by VIN
 export const getVehicleByVin = async (req: AuthRequest, res: Response) => {
@@ -63,10 +61,10 @@ export const getVehicleByVin = async (req: AuthRequest, res: Response) => {
     console.error("Error fetching vehicle:", error);
     res.status(500).json({ error: "Error fetching vehicle" });
   }
-}
+};
 
 // POST create new vehicle
-export const createVehicle =  async (req: AuthRequest, res: Response) => {
+export const createVehicle = async (req: AuthRequest, res: Response) => {
   try {
     const VehicleModel = getVehicleModel(req.db);
     if (!VehicleModel) {
@@ -84,10 +82,10 @@ export const createVehicle =  async (req: AuthRequest, res: Response) => {
       details: error.message,
     });
   }
-}
+};
 
 // PUT update vehicle by ID
-router.put("/id/:id", async (req: AuthRequest, res: Response) => {
+export const editVehicleById = async (req: AuthRequest, res: Response) => {
   try {
     const VehicleModel = getVehicleModel(req.db);
     if (!VehicleModel) {
@@ -111,10 +109,10 @@ router.put("/id/:id", async (req: AuthRequest, res: Response) => {
       details: error.message,
     });
   }
-});
+};
 
 // DELETE vehicle by ID
-router.delete("/id/:id", async (req: AuthRequest, res: Response) => {
+export const deleteVehicleById =  async (req: AuthRequest, res: Response) => {
   try {
     const VehicleModel = getVehicleModel(req.db);
     if (!VehicleModel) {
@@ -134,6 +132,6 @@ router.delete("/id/:id", async (req: AuthRequest, res: Response) => {
     console.error("Error deleting vehicle:", error);
     res.status(500).json({ error: "Error deleting vehicle" });
   }
-});
+}
 
 export default router;

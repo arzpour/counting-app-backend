@@ -1,10 +1,9 @@
 import express, { Request, Response, Router } from "express";
-import Cheque from "../models/cheques-new";
 
 const router: Router = express.Router();
 
 // GET all cheques
-router.get("/", async (req: Request, res: Response) => {
+export const getAllCheques = async (req: Request, res: Response) => {
   try {
     const cheques = await Cheque.find();
     res.json(cheques);
@@ -12,10 +11,10 @@ router.get("/", async (req: Request, res: Response) => {
     console.error("Error fetching cheques:", error);
     res.status(500).json({ error: "Error fetching cheques" });
   }
-});
+}
 
 // GET cheques by vin
-router.get("/vin/:vin", async (req: Request, res: Response) => {
+export const getAllChequesByVin = async (req: Request, res: Response) => {
   try {
     const cheques = await Cheque.find({ vin: req.params.vin });
     res.json(cheques);
@@ -23,10 +22,10 @@ router.get("/vin/:vin", async (req: Request, res: Response) => {
     console.error("Error fetching cheques:", error);
     res.status(500).json({ error: "Error fetching cheques" });
   }
-});
+}
 
 // GET cheque by ID
-router.get("/id/:id", async (req: Request, res: Response) => {
+export const getChequeById = async (req: Request, res: Response) => {
   try {
     const cheque = await Cheque.findById(req.params.id);
     if (!cheque) {
@@ -37,10 +36,10 @@ router.get("/id/:id", async (req: Request, res: Response) => {
     console.error("Error fetching cheque:", error);
     res.status(500).json({ error: "Error fetching cheque" });
   }
-});
+}
 
 // GET cheques by deal ID
-router.get("/deal/:dealId", async (req: Request, res: Response) => {
+export const getChequesByDealId = async (req: Request, res: Response) => {
   try {
     const cheques = await Cheque.find({ relatedDealId: req.params.dealId });
     res.json(cheques);
@@ -48,10 +47,10 @@ router.get("/deal/:dealId", async (req: Request, res: Response) => {
     console.error("Error fetching cheques:", error);
     res.status(500).json({ error: "Error fetching cheques" });
   }
-});
+}
 
 // GET cheques by person ID (payer or payee)
-router.get("/person/:personId", async (req: Request, res: Response) => {
+export const getChequesByPersonId =  async (req: Request, res: Response) => {
   try {
     const { personId } = req.params;
     const cheques = await Cheque.find({
@@ -70,10 +69,10 @@ router.get("/person/:personId", async (req: Request, res: Response) => {
     console.error("Error fetching cheques:", error);
     res.status(500).json({ error: "Error fetching cheques" });
   }
-});
+}
 
 // GET cheques by status
-router.get("/status/:status", async (req: Request, res: Response) => {
+export const getChequesByStatus = async (req: Request, res: Response) => {
   try {
     const cheques = await Cheque.find({ status: req.params.status });
     res.json(cheques);
@@ -81,10 +80,10 @@ router.get("/status/:status", async (req: Request, res: Response) => {
     console.error("Error fetching cheques:", error);
     res.status(500).json({ error: "Error fetching cheques" });
   }
-});
+}
 
 // GET unpaid cheques by deal ID
-router.get("/unpaid/deal/:dealId", async (req: Request, res: Response) => {
+export const getUnPaidChequesByDealId = async (req: Request, res: Response) => {
   try {
     const cheques = await Cheque.find({
       relatedDealId: req.params.dealId,
@@ -114,10 +113,10 @@ router.get("/unpaid/deal/:dealId", async (req: Request, res: Response) => {
     console.error("Error fetching unpaid cheques:", error);
     res.status(500).json({ error: "Error fetching unpaid cheques" });
   }
-});
+}
 
 // POST create new cheque
-router.post("/", async (req: Request, res: Response) => {
+export const createCheque = async (req: Request, res: Response) => {
   try {
     const newCheque = new Cheque(req.body);
     const savedCheque = await newCheque.save();
@@ -129,10 +128,10 @@ router.post("/", async (req: Request, res: Response) => {
       details: error.message,
     });
   }
-});
+}
 
 // PUT update cheque by ID
-router.put("/id/:id", async (req: Request, res: Response) => {
+export const editChequeById =  async (req: Request, res: Response) => {
   try {
     const updatedCheque = await Cheque.findByIdAndUpdate(
       req.params.id,
@@ -150,10 +149,11 @@ router.put("/id/:id", async (req: Request, res: Response) => {
       details: error.message,
     });
   }
-});
+}
+
 
 // POST add action to cheque
-router.post("/id/:id/action", async (req: Request, res: Response) => {
+export const addActionToCheque = async (req: Request, res: Response) => {
   try {
     const cheque = await Cheque.findById(req.params.id);
     if (!cheque) {
@@ -179,10 +179,10 @@ router.post("/id/:id/action", async (req: Request, res: Response) => {
       details: error.message,
     });
   }
-});
+}
 
 // DELETE cheque by ID
-router.delete("/id/:id", async (req: Request, res: Response) => {
+export const deleteChequeById = async (req: Request, res: Response) => {
   try {
     const deletedCheque = await Cheque.findByIdAndDelete(req.params.id);
     if (!deletedCheque) {
@@ -193,6 +193,6 @@ router.delete("/id/:id", async (req: Request, res: Response) => {
     console.error("Error deleting cheque:", error);
     res.status(500).json({ error: "Error deleting cheque" });
   }
-});
+}
 
 export default router;

@@ -3,7 +3,7 @@ import express, { Router } from "express";
 import vehiclesRouter from "./vehicles";
 import dealsRouter from "./deals";
 import peopleRouter from "./people";
-import chequesRouter from "./cheques-new";
+import chequesRouter from "./cheques";
 import transactionsRouter from "./transactions-new";
 import businessAccountsRouter from "./business-accounts";
 import salariesRouter from "./salaries";
