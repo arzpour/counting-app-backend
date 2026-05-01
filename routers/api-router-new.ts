@@ -4,7 +4,7 @@ import vehiclesRouter from "./vehicles";
 import dealsRouter from "./deals";
 import peopleRouter from "./people";
 import chequesRouter from "./cheques";
-import transactionsRouter from "./transactions-new";
+import transactionsRouter from "./transactions";
 import businessAccountsRouter from "./business-accounts";
 import salariesRouter from "./salaries";
 import expensesRouter from "./expenses";

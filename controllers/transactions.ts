@@ -4,7 +4,7 @@ import Transaction from "../models/transactions-new";
 const router = Router();
 
 // GET all transactions
-router.get("/", async (req: Request, res: Response) => {
+export const getAllTransactions = async (req: Request, res: Response) => {
   try {
     const transactions = await Transaction.find();
     res.json(transactions);
@@ -12,10 +12,10 @@ router.get("/", async (req: Request, res: Response) => {
     console.error("Error fetching transactions:", error);
     res.status(500).json({ error: "Error fetching transactions" });
   }
-});
+};
 
 // GET transaction by ID
-router.get("/id/:id", async (req: Request, res: Response) => {
+export const getTransactionById = async (req: Request, res: Response) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
     if (!transaction) {
@@ -26,10 +26,11 @@ router.get("/id/:id", async (req: Request, res: Response) => {
     console.error("Error fetching transaction:", error);
     res.status(500).json({ error: "Error fetching transaction" });
   }
-});
+};
+
 
 // GET transactions by deal ID
-router.get("/deal/:dealId", async (req: Request, res: Response) => {
+export const getTransactionByDealId = async (req: Request, res: Response) => {
   try {
     const transactions = await Transaction.find({ dealId: req.params.dealId });
     res.json(transactions);
@@ -37,10 +38,11 @@ router.get("/deal/:dealId", async (req: Request, res: Response) => {
     console.error("Error fetching transactions:", error);
     res.status(500).json({ error: "Error fetching transactions" });
   }
-});
+};
+
 
 // GET transactions by person ID
-router.get("/person/:personId", async (req: Request, res: Response) => {
+export const getTransactionByPersonId = async (req: Request, res: Response) => {
   try {
     const transactions = await Transaction.find({
       personId: req.params.personId,
@@ -50,10 +52,14 @@ router.get("/person/:personId", async (req: Request, res: Response) => {
     console.error("Error fetching transactions:", error);
     res.status(500).json({ error: "Error fetching transactions" });
   }
-});
+};
+
 
 // GET transactions by business account ID
-router.get("/account/:accountId", async (req: Request, res: Response) => {
+export const getTransactionsByBusinessAccountId = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const transactions = await Transaction.find({
       bussinessAccountId: req.params.accountId,
@@ -63,10 +69,11 @@ router.get("/account/:accountId", async (req: Request, res: Response) => {
     console.error("Error fetching transactions:", error);
     res.status(500).json({ error: "Error fetching transactions" });
   }
-});
+};
+
 
 // GET transactions by type
-router.get("/type/:type", async (req: Request, res: Response) => {
+export const getTransactionsByType = async (req: Request, res: Response) => {
   try {
     const transactions = await Transaction.find({ type: req.params.type });
     res.json(transactions);
@@ -74,10 +81,11 @@ router.get("/type/:type", async (req: Request, res: Response) => {
     console.error("Error fetching transactions:", error);
     res.status(500).json({ error: "Error fetching transactions" });
   }
-});
+};
+
 
 // GET transactions by date range
-router.get("/date-range", async (req: Request, res: Response) => {
+export const getTransactionsByDate = async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.query;
     const transactions = await Transaction.find({
@@ -91,10 +99,11 @@ router.get("/date-range", async (req: Request, res: Response) => {
     console.error("Error fetching transactions:", error);
     res.status(500).json({ error: "Error fetching transactions" });
   }
-});
+};
+
 
 // POST create new transaction
-router.post("/", async (req: Request, res: Response) => {
+export const createTransaction = async (req: Request, res: Response) => {
   try {
     const newTransaction = new Transaction(req.body);
     const savedTransaction = await newTransaction.save();
@@ -106,10 +115,11 @@ router.post("/", async (req: Request, res: Response) => {
       details: error.message,
     });
   }
-});
+};
+
 
 // PUT update transaction by ID
-router.put("/id/:id", async (req: Request, res: Response) => {
+export const editTransactionById = async (req: Request, res: Response) => {
   try {
     const updatedTransaction = await Transaction.findByIdAndUpdate(
       req.params.id,
@@ -127,7 +137,7 @@ router.put("/id/:id", async (req: Request, res: Response) => {
       details: error.message,
     });
   }
-});
+};
 
 
 // DELETE transaction by ID
@@ -149,7 +159,7 @@ router.put("/id/:id", async (req: Request, res: Response) => {
 //   }
 // });
 
-router.delete("/id/:id", async (req, res) => {
+export const deleteTransactionById = async (req: Request, res: Response) => {
   try {
     const base = await Transaction.findById(req.params.id);
     if (!base) return res.status(404).json({ error: "Transaction not found" });
@@ -168,6 +178,6 @@ router.delete("/id/:id", async (req, res) => {
     console.error("Error deleting transaction:", error);
     res.status(500).json({ error: "Error deleting transaction" });
   }
-});
+};
 
 export default router;
