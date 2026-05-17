@@ -13,12 +13,12 @@ import {
 const router = Router();
 
 router.get("/", getAllSalaries);
-router.get("/id/:id", getSalarieById);
+router.get("/byId/:id", getSalarieById);
 router.get("/employee/:personId", getSalariesByPersonId);
-router.get("/period/:year/:month", getSalariesByDate);
-router.get("/year/:year", getSalariesByYear);
+router.get("/byPeriod/:year/:month", getSalariesByDate);
+router.get("/byYear/:year", getSalariesByYear);
 router.post("/", createSalary);
-router.put("/id/:id", editSalaryById);
-router.delete("/id/:id", deleteSalaryById);
+router.put("/byId/:id", editSalaryById);
+router.delete("/byId/:id", deleteSalaryById);
 
 export default router;

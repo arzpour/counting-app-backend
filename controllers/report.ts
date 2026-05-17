@@ -1,8 +1,9 @@
-import People from "../models/people";
-import Transaction from "../models/transactions-new";
-import Cheque from "../models/cheques-new";
-import Deal from "../models/deals";
 import moment from "moment-jalaali";
+import { getPeopleModel } from "../models/people";
+import { getTransactionModel } from "../models/transactions";
+import { getChequeModel } from "../models/cheques";
+import { getDealModel } from "../models/deals";
+import { AuthRequest } from "../types/db";
 
 interface ReportItem {
   date?: string;
@@ -26,6 +27,8 @@ export const getPersonReportData = async (
   startDate: string,
   endDate: string,
   nationalId: string,
+  req: AuthRequest,
+  res: any,
 ): Promise<ReportData> => {
   const reportData: ReportData = {
     transactions: [],
@@ -58,7 +61,29 @@ export const getPersonReportData = async (
       findCriteria.$or = [{ lastName: { $regex: lastName, $options: "i" } }];
     }
 
-    const person = await People.findOne(findCriteria);
+    const PeopleModel = getPeopleModel(req.db);
+    if (!PeopleModel) {
+      return res.status(500).json({ error: "People model is not initialized" });
+    }
+
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      return res
+        .status(500)
+        .json({ error: "Transaction model is not initialized" });
+    }
+
+    const DealModel = getDealModel(req.db);
+    if (!DealModel) {
+      return res.status(500).json({ error: "Deal model is not initialized" });
+    }
+
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+
+    const person = await PeopleModel.findOne(findCriteria);
     if (!person) {
       throw new Error("فرد مورد نظر با کد ملی یا نام داده شده یافت نشد.");
     }
@@ -109,7 +134,7 @@ export const getPersonReportData = async (
     // ==========================================
     // 2. Fetch Transactions
     // ==========================================
-    const transactions = await Transaction.find({
+    const transactions = await TransactionModel.find({
       $or: [
         { personId: personId },
         { secondPersonId: personId },
@@ -148,7 +173,7 @@ export const getPersonReportData = async (
     // ==========================================
     // 3. Fetch & Process Cheques
     // ==========================================
-    const cheques = await Cheque.find({
+    const cheques = await ChequeModel.find({
       $or: [
         { "customer.personId": personId },
         { "payer.personId": personId },
@@ -197,7 +222,7 @@ export const getPersonReportData = async (
     // ==========================================
     // 4. Fetch & Process Deals
     // ==========================================
-    const deals = await Deal.find({
+    const deals = await DealModel.find({
       $or: [
         { "seller.personId": personId },
         { "buyer.personId": personId },
