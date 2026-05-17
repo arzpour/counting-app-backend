@@ -1,5 +1,16 @@
 import { Types } from "mongoose";
 
+export interface IOption {
+  _id: string;
+  provider: {
+    personId: string;
+    name: string;
+  };
+  date: string;
+  description: string;
+  cost: string;
+}
+
 export interface IDeal {
   _id: Types.ObjectId;
   vehicleId: number;
@@ -41,16 +52,7 @@ export interface IDeal {
   commissionPercent: number;
   commissionAmount: number;
   directCosts: {
-    options: {
-      _id: string;
-      provider: {
-        personId: string;
-        name: string;
-      };
-      date: string;
-      description: string;
-      cost: string;
-    }[];
+    options: IOption[];
     otherCost: {
       _id: string;
       category: string;

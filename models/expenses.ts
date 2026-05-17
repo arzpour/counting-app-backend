@@ -20,7 +20,7 @@ const expenseSchema = new Schema<IExpenseDoc>(
 export function getExpenseModel(db: any) {
   if (!db) return null;
   if (db.models?.Expense) return db.models.Expense;
-  return db.model("Expense", expenseSchema);
+  return db.model("Expense", expenseSchema, "expenses");
 }
 
 // const Expense = mongoose.model<IExpenseDoc>(

@@ -94,7 +94,7 @@ const dealSchema = new Schema<IDealDoc>(
 export function getDealModel(db: any) {
   if (!db) return null;
   if (db.models?.Deal) return db.models.Deal;
-  return db.model("Deal", dealSchema);
+  return db.model("Deal", dealSchema, "deals");
 }
 
 // const Deal = mongoose.model<IDealDoc>("Deal", dealSchema, "deals");

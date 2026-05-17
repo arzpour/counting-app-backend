@@ -52,7 +52,7 @@ const chequeSchema = new Schema<IChequeDoc>(
 export function getChequeModel(db: any) {
   if (!db) return null;
   if (db.models?.Cheque) return db.models.Cheque;
-  return db.model("Cheque", chequeSchema);
+  return db.model("Cheque", chequeSchema, "cheques");
 }
 
 // const Cheque = mongoose.model<IChequeDoc>("Cheque", chequeSchema, "cheques");

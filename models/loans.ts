@@ -35,7 +35,7 @@ const loanSchema = new Schema<ILoanDoc>(
 export function getLoanModel(db: any) {
   if (!db) return null;
   if (db.models?.Loan) return db.models.Loan;
-  return db.model("Loan", loanSchema);
+  return db.model("Loan", loanSchema, "loans");
 }
 
 // const Loan = mongoose.model<ILoanDoc>("Loan", loanSchema, "loans");

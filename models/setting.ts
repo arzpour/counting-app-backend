@@ -20,7 +20,7 @@ const settingsSchema = new Schema<IDataSettings>({
 export function getSettingModel(db: any) {
   if (!db) return null;
   if (db.models?.Setting) return db.models.Setting;
-  return db.model("Setting", settingsSchema);
+  return db.model("Setting", settingsSchema, "setting");
 }
 
 // const Setting = mongoose.model<IDataSettings>("Setting", settingsSchema, "setting");

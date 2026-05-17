@@ -36,7 +36,7 @@ const transactionSchema = new Schema<ITransactionDoc>(
 export function getTransactionModel(db: any) {
   if (!db) return null;
   if (db.models?.Transaction) return db.models.Transaction;
-  return db.model("Transaction", transactionSchema);
+  return db.model("Transaction", transactionSchema, "transactions");
 }
 
 // const Transaction = mongoose.model<ITransactionDoc>(

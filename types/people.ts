@@ -1,5 +1,17 @@
 import { Types } from "mongoose";
 
+export interface IWalletTransaction {
+  amount: number;
+  type: string;
+  description: string;
+  date: string;
+  dealID: string;
+  transactionID: string;
+  optionId?: string;
+  chequeId?: string;
+  moneyChangerId?: string;
+}
+
 export interface IPeople {
   _id: Types.ObjectId;
   firstName: string;
@@ -31,15 +43,6 @@ export interface IPeople {
   };
   wallet: {
     balance: number;
-    transactions: {
-      amount: number;
-      type: string;
-      description: string;
-      date: string;
-      dealID: string;
-      transactionID: string;
-      optionId?: string;
-      chequeId?: string;
-    }[];
+    transactions: IWalletTransaction[];
   };
 }

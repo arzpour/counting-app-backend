@@ -1,7 +1,8 @@
-import  { Document, Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 import { IBusinessAccounts } from "../types/business_accounts";
 
-export interface IBusinessAccountsDoc extends Document, Omit<IBusinessAccounts, "_id"> {}
+export interface IBusinessAccountsDoc
+  extends Document, Omit<IBusinessAccounts, "_id"> {}
 
 const businessAccountsSchema = new Schema<IBusinessAccountsDoc>(
   {
@@ -16,14 +17,17 @@ const businessAccountsSchema = new Schema<IBusinessAccountsDoc>(
   },
   {
     timestamps: true,
-  }
+  },
 );
-
 
 export function getBusinessAccountsModel(db: any) {
   if (!db) return null;
   if (db.models?.BusinessAccounts) return db.models.BusinessAccounts;
-  return db.model("BusinessAccounts", businessAccountsSchema);
+  return db.model(
+    "BusinessAccounts",
+    businessAccountsSchema,
+    "business_accounts",
+  );
 }
 
 // const BusinessAccounts = mongoose.model<IBusinessAccountsDoc>(

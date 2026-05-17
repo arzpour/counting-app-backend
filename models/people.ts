@@ -46,6 +46,7 @@ const peopleSchema = new Schema<IPeopleDoc>(
           transactionID: { type: String },
           optionId: { type: String },
           chequeId: { type: String },
+          moneyChangerId: { type: String },
         },
       ],
     },
@@ -58,7 +59,8 @@ const peopleSchema = new Schema<IPeopleDoc>(
 export function getPeopleModel(db: any) {
   if (!db) return null;
   if (db.models?.People) return db.models.People;
-  return db.model("People", peopleSchema);
+  // return db.model("people", peopleSchema);
+  return db.model("People", peopleSchema, "people");
 }
 
 // const People = mongoose.model<IPeopleDoc>("People", peopleSchema, "people");

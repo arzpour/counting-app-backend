@@ -40,7 +40,7 @@ const vehicleSchema = new Schema<IVehicleDoc>(
 export function getVehicleModel(db: any) {
   if (!db) return null;
   if (db.models?.Vehicle) return db.models.Vehicle;
-  return db.model("Vehicle", vehicleSchema);
+  return db.model("Vehicle", vehicleSchema, "vehicles");
 }
 
 // const Vehicle = mongoose.model<IVehicleDoc>(

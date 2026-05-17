@@ -51,7 +51,7 @@ const salariesSchema = new Schema<ISalariesDoc>(
 export function getSalariesModel(db: any) {
   if (!db) return null;
   if (db.models?.Salaries) return db.models.Salaries;
-  return db.model("Salaries", salariesSchema);
+  return db.model("Salaries", salariesSchema, "salaries");
 }
 
 // const Salaries = mongoose.model<ISalariesDoc>("Salaries", salariesSchema, "salaries");
