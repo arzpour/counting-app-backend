@@ -1,11 +1,22 @@
-import express, { Request, Response, Router } from "express";
+import express, { Response, Router } from "express";
+import { getBusinessAccountsModel } from "../models/business-accounts";
+import { AuthRequest } from "../types/db";
 
 const router: Router = express.Router();
 
 // GET all business accounts
-export const getAllBusinessAccounts = async (req: Request, res: Response) => {
+export const getAllBusinessAccounts = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
-    const accounts = await BusinessAccounts.find();
+    const BusinessAccountsModel = getBusinessAccountsModel(req.db);
+    if (!BusinessAccountsModel) {
+      return res
+        .status(500)
+        .json({ error: "BusinessAccounts model is not initialized" });
+    }
+    const accounts = await BusinessAccountsModel.find();
     res.json(accounts);
   } catch (error) {
     console.error("Error fetching business accounts:", error);
@@ -15,11 +26,17 @@ export const getAllBusinessAccounts = async (req: Request, res: Response) => {
 
 // GET active business accounts
 export const getActiveBusinessAccounts = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
 ) => {
   try {
-    const accounts = await BusinessAccounts.find({ isActive: true });
+    const BusinessAccountsModel = getBusinessAccountsModel(req.db);
+    if (!BusinessAccountsModel) {
+      return res
+        .status(500)
+        .json({ error: "BusinessAccounts model is not initialized" });
+    }
+    const accounts = await BusinessAccountsModel.find({ isActive: true });
     res.json(accounts);
   } catch (error) {
     console.error("Error fetching active accounts:", error);
@@ -28,9 +45,18 @@ export const getActiveBusinessAccounts = async (
 };
 
 // GET business account by ID
-export const getBusinessAccountById = async (req: Request, res: Response) => {
+export const getBusinessAccountById = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
-    const account = await BusinessAccounts.findById(req.params.id);
+    const BusinessAccountsModel = getBusinessAccountsModel(req.db);
+    if (!BusinessAccountsModel) {
+      return res
+        .status(500)
+        .json({ error: "BusinessAccounts model is not initialized" });
+    }
+    const account = await BusinessAccountsModel.findById(req.params.id);
     if (!account) {
       return res.status(404).json({ error: "Business account not found" });
     }
@@ -43,11 +69,17 @@ export const getBusinessAccountById = async (req: Request, res: Response) => {
 
 // GET business account by account number
 export const getBusinessAccountByAccountNumber = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
 ) => {
   try {
-    const account = await BusinessAccounts.findOne({
+    const BusinessAccountsModel = getBusinessAccountsModel(req.db);
+    if (!BusinessAccountsModel) {
+      return res
+        .status(500)
+        .json({ error: "BusinessAccounts model is not initialized" });
+    }
+    const account = await BusinessAccountsModel.findOne({
       accountNumber: req.params.accountNumber,
     });
     if (!account) {
@@ -61,9 +93,18 @@ export const getBusinessAccountByAccountNumber = async (
 };
 
 // POST create new business account
-export const createBusinessAccount = async (req: Request, res: Response) => {
+export const createBusinessAccount = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
-    const newAccount = new BusinessAccounts(req.body);
+    const BusinessAccountsModel = getBusinessAccountsModel(req.db);
+    if (!BusinessAccountsModel) {
+      return res
+        .status(500)
+        .json({ error: "BusinessAccounts model is not initialized" });
+    }
+    const newAccount = new BusinessAccountsModel(req.body);
     const savedAccount = await newAccount.save();
     res.status(201).json(savedAccount);
   } catch (error: any) {
@@ -76,9 +117,18 @@ export const createBusinessAccount = async (req: Request, res: Response) => {
 };
 
 // PUT update business account by ID
-export const editBusinessAccountById = async (req: Request, res: Response) => {
+export const editBusinessAccountById = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
-    const updatedAccount = await BusinessAccounts.findByIdAndUpdate(
+    const BusinessAccountsModel = getBusinessAccountsModel(req.db);
+    if (!BusinessAccountsModel) {
+      return res
+        .status(500)
+        .json({ error: "BusinessAccounts model is not initialized" });
+    }
+    const updatedAccount = await BusinessAccountsModel.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
       { new: true, runValidators: true },
@@ -98,12 +148,18 @@ export const editBusinessAccountById = async (req: Request, res: Response) => {
 
 // PUT update balance
 export const editBusinessAccountBalanceById = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
 ) => {
   try {
+    const BusinessAccountsModel = getBusinessAccountsModel(req.db);
+    if (!BusinessAccountsModel) {
+      return res
+        .status(500)
+        .json({ error: "BusinessAccounts model is not initialized" });
+    }
     const { amount } = req.body;
-    const account = await BusinessAccounts.findById(req.params.id);
+    const account = await BusinessAccountsModel.findById(req.params.id);
 
     if (!account) {
       return res.status(404).json({ error: "Business account not found" });
@@ -124,11 +180,17 @@ export const editBusinessAccountBalanceById = async (
 
 // DELETE business account by ID
 export const deleteBusinessAccountById = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
 ) => {
   try {
-    const deletedAccount = await BusinessAccounts.findByIdAndDelete(
+    const BusinessAccountsModel = getBusinessAccountsModel(req.db);
+    if (!BusinessAccountsModel) {
+      return res
+        .status(500)
+        .json({ error: "BusinessAccounts model is not initialized" });
+    }
+    const deletedAccount = await BusinessAccountsModel.findByIdAndDelete(
       req.params.id,
     );
     if (!deletedAccount) {

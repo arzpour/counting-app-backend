@@ -1,7 +1,7 @@
-import express, { Request, Response, Router } from "express";
-// import Deal, { getDealModel } from "../models/deals";
+import express, { Response, Router } from "express";
 import { AuthRequest } from "../types/db";
 import { getDealModel } from "../models/deals";
+import { IDeal, IOption } from "../types/deals";
 
 const router: Router = express.Router();
 
@@ -79,7 +79,7 @@ export const getDealsByPersonId = async (req: AuthRequest, res: Response) => {
       return res.status(500).json({ error: "Deal model is not initialized" });
     }
     const { personId } = req.params;
-    const deals = await DealModel.find({
+    const deals: IDeal[] = await DealModel.find({
       $or: [
         { "seller.personId": personId },
         { "buyer.personId": personId },
@@ -233,7 +233,7 @@ export const deleteDealByOptionId = async (req: AuthRequest, res: Response) => {
     }
 
     const updatedOptions = deal.directCosts.options.filter(
-      (option) => option._id && option._id.toString() !== optionId,
+      (option: IOption) => option._id && option._id.toString() !== optionId,
     );
 
     const updatedDeal = await DealModel.findByIdAndUpdate(

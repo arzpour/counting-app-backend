@@ -1,33 +1,48 @@
-import express, { Request, Response, Router } from "express";
+import express, { Response, Router } from "express";
+import { getChequeModel } from "../models/cheques";
+import { AuthRequest } from "../types/db";
+import { ICheque } from "../types/cheque";
 
 const router: Router = express.Router();
 
 // GET all cheques
-export const getAllCheques = async (req: Request, res: Response) => {
+export const getAllCheques = async (req: AuthRequest, res: Response) => {
   try {
-    const cheques = await Cheque.find();
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+    const cheques = await ChequeModel.find();
     res.json(cheques);
   } catch (error) {
     console.error("Error fetching cheques:", error);
     res.status(500).json({ error: "Error fetching cheques" });
   }
-}
+};
 
 // GET cheques by vin
-export const getAllChequesByVin = async (req: Request, res: Response) => {
+export const getAllChequesByVin = async (req: AuthRequest, res: Response) => {
   try {
-    const cheques = await Cheque.find({ vin: req.params.vin });
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+    const cheques = await ChequeModel.find({ vin: req.params.vin });
     res.json(cheques);
   } catch (error) {
     console.error("Error fetching cheques:", error);
     res.status(500).json({ error: "Error fetching cheques" });
   }
-}
+};
 
 // GET cheque by ID
-export const getChequeById = async (req: Request, res: Response) => {
+export const getChequeById = async (req: AuthRequest, res: Response) => {
   try {
-    const cheque = await Cheque.findById(req.params.id);
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+    const cheque = await ChequeModel.findById(req.params.id);
     if (!cheque) {
       return res.status(404).json({ error: "Cheque not found" });
     }
@@ -36,24 +51,34 @@ export const getChequeById = async (req: Request, res: Response) => {
     console.error("Error fetching cheque:", error);
     res.status(500).json({ error: "Error fetching cheque" });
   }
-}
+};
 
 // GET cheques by deal ID
-export const getChequesByDealId = async (req: Request, res: Response) => {
+export const getChequesByDealId = async (req: AuthRequest, res: Response) => {
   try {
-    const cheques = await Cheque.find({ relatedDealId: req.params.dealId });
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+    const cheques = await ChequeModel.find({
+      relatedDealId: req.params.dealId,
+    });
     res.json(cheques);
   } catch (error) {
     console.error("Error fetching cheques:", error);
     res.status(500).json({ error: "Error fetching cheques" });
   }
-}
+};
 
 // GET cheques by person ID (payer or payee)
-export const getChequesByPersonId =  async (req: Request, res: Response) => {
+export const getChequesByPersonId = async (req: AuthRequest, res: Response) => {
   try {
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
     const { personId } = req.params;
-    const cheques = await Cheque.find({
+    const cheques: ICheque[] = await ChequeModel.find({
       $or: [
         { "payer.personId": personId },
         { "payee.personId": personId },
@@ -69,23 +94,34 @@ export const getChequesByPersonId =  async (req: Request, res: Response) => {
     console.error("Error fetching cheques:", error);
     res.status(500).json({ error: "Error fetching cheques" });
   }
-}
+};
 
 // GET cheques by status
-export const getChequesByStatus = async (req: Request, res: Response) => {
+export const getChequesByStatus = async (req: AuthRequest, res: Response) => {
   try {
-    const cheques = await Cheque.find({ status: req.params.status });
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+    const cheques = await ChequeModel.find({ status: req.params.status });
     res.json(cheques);
   } catch (error) {
     console.error("Error fetching cheques:", error);
     res.status(500).json({ error: "Error fetching cheques" });
   }
-}
+};
 
 // GET unpaid cheques by deal ID
-export const getUnPaidChequesByDealId = async (req: Request, res: Response) => {
+export const getUnPaidChequesByDealId = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
-    const cheques = await Cheque.find({
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+    const cheques: ICheque[] = await ChequeModel.find({
       relatedDealId: req.params.dealId,
       status: { $ne: "paid" },
     });
@@ -113,12 +149,16 @@ export const getUnPaidChequesByDealId = async (req: Request, res: Response) => {
     console.error("Error fetching unpaid cheques:", error);
     res.status(500).json({ error: "Error fetching unpaid cheques" });
   }
-}
+};
 
 // POST create new cheque
-export const createCheque = async (req: Request, res: Response) => {
+export const createCheque = async (req: AuthRequest, res: Response) => {
   try {
-    const newCheque = new Cheque(req.body);
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+    const newCheque = new ChequeModel(req.body);
     const savedCheque = await newCheque.save();
     res.status(201).json(savedCheque);
   } catch (error: any) {
@@ -128,12 +168,16 @@ export const createCheque = async (req: Request, res: Response) => {
       details: error.message,
     });
   }
-}
+};
 
 // PUT update cheque by ID
-export const editChequeById =  async (req: Request, res: Response) => {
+export const editChequeById = async (req: AuthRequest, res: Response) => {
   try {
-    const updatedCheque = await Cheque.findByIdAndUpdate(
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+    const updatedCheque = await ChequeModel.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
       { new: true, runValidators: true },
@@ -149,13 +193,16 @@ export const editChequeById =  async (req: Request, res: Response) => {
       details: error.message,
     });
   }
-}
-
+};
 
 // POST add action to cheque
-export const addActionToCheque = async (req: Request, res: Response) => {
+export const addActionToCheque = async (req: AuthRequest, res: Response) => {
   try {
-    const cheque = await Cheque.findById(req.params.id);
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+    const cheque = await ChequeModel.findById(req.params.id);
     if (!cheque) {
       return res.status(404).json({ error: "Cheque not found" });
     }
@@ -179,12 +226,16 @@ export const addActionToCheque = async (req: Request, res: Response) => {
       details: error.message,
     });
   }
-}
+};
 
 // DELETE cheque by ID
-export const deleteChequeById = async (req: Request, res: Response) => {
+export const deleteChequeById = async (req: AuthRequest, res: Response) => {
   try {
-    const deletedCheque = await Cheque.findByIdAndDelete(req.params.id);
+    const ChequeModel = getChequeModel(req.db);
+    if (!ChequeModel) {
+      return res.status(500).json({ error: "Cheque model is not initialized" });
+    }
+    const deletedCheque = await ChequeModel.findByIdAndDelete(req.params.id);
     if (!deletedCheque) {
       return res.status(404).json({ error: "Cheque not found" });
     }
@@ -193,6 +244,6 @@ export const deleteChequeById = async (req: Request, res: Response) => {
     console.error("Error deleting cheque:", error);
     res.status(500).json({ error: "Error deleting cheque" });
   }
-}
+};
 
 export default router;

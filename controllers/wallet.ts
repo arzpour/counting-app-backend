@@ -1,6 +1,8 @@
 // backend/routes/wallet.ts
-import express, { Request, Response } from "express";
-import People from "../models/people";
+import express, { Response } from "express";
+import { getPeopleModel } from "../models/people";
+import { AuthRequest } from "../types/db";
+import { IWalletTransaction } from "../types/people";
 
 const router = express.Router();
 
@@ -15,7 +17,7 @@ interface WalletTransferRequest {
   reason: "provider" | "broker" | "financier" | "person";
 }
 
-export const updateWalletTransfer = async (req: Request, res: Response) => {
+export const updateWalletTransfer = async (req: AuthRequest, res: Response) => {
   try {
     const {
       oldPersonId,
@@ -31,6 +33,10 @@ export const updateWalletTransfer = async (req: Request, res: Response) => {
     if (oldPersonId === newPersonId || !oldPersonId || !newPersonId) {
       return res.status(200).json({ message: "Same person or missing IDs" });
     }
+    const PeopleModel = getPeopleModel(req.db);
+    if (!PeopleModel) {
+      return res.status(500).json({ error: "People model is not initialized" });
+    }
 
     const walletTransactionData = {
       amount,
@@ -42,7 +48,7 @@ export const updateWalletTransfer = async (req: Request, res: Response) => {
       optionId: reason,
     };
 
-    const oldPerson = await People.findOneAndUpdate(
+    const oldPerson = await PeopleModel.findOneAndUpdate(
       {
         _id: oldPersonId,
         "wallet.transactions.transactionID": transactionId,
@@ -60,7 +66,7 @@ export const updateWalletTransfer = async (req: Request, res: Response) => {
         (sum: number, t: any) => sum + (t.amount || 0),
         0,
       );
-      await People.updateOne(
+      await PeopleModel.updateOne(
         { _id: oldPersonId },
         { $set: { "wallet.balance": newBalance } },
       );
@@ -68,7 +74,7 @@ export const updateWalletTransfer = async (req: Request, res: Response) => {
       console.log(`⚠️ Transaction not found in old person's wallet`);
     }
 
-    const newPerson = await People.findById(newPersonId);
+    const newPerson = await PeopleModel.findById(newPersonId);
 
     if (newPerson) {
       const existingTransaction = newPerson.wallet.transactions.find(
@@ -76,7 +82,7 @@ export const updateWalletTransfer = async (req: Request, res: Response) => {
       );
 
       if (!existingTransaction) {
-        await People.updateOne(
+        await PeopleModel.updateOne(
           { _id: newPersonId },
           {
             $push: {
@@ -85,13 +91,13 @@ export const updateWalletTransfer = async (req: Request, res: Response) => {
           },
         );
 
-        const updatedPerson = await People.findById(newPersonId);
+        const updatedPerson = await PeopleModel.findById(newPersonId);
         if (updatedPerson) {
           const newBalance = updatedPerson.wallet.transactions.reduce(
             (sum: number, t: any) => sum + (t.amount || 0),
             0,
           );
-          await People.updateOne(
+          await PeopleModel.updateOne(
             { _id: newPersonId },
             { $set: { "wallet.balance": newBalance } },
           );
@@ -110,9 +116,12 @@ export const updateWalletTransfer = async (req: Request, res: Response) => {
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
-}
+};
 
-export const updateMultipleWalletTransfer =  async (req: Request, res: Response) => {
+export const updateMultipleWalletTransfer = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
     const { updates } = req.body as {
       updates: Array<{
@@ -125,11 +134,16 @@ export const updateMultipleWalletTransfer =  async (req: Request, res: Response)
       }>;
     };
 
+    const PeopleModel = getPeopleModel(req.db);
+    if (!PeopleModel) {
+      return res.status(500).json({ error: "People model is not initialized" });
+    }
+
     for (const update of updates) {
-      const person = await People.findById(update.personId);
+      const person = await PeopleModel.findById(update.personId);
       if (person) {
         const existingIndex = person.wallet.transactions.findIndex(
-          (t) => t.transactionID === update.transactionId,
+          (t: IWalletTransaction) => t.transactionID === update.transactionId,
         );
 
         if (existingIndex > -1) {
@@ -155,7 +169,7 @@ export const updateMultipleWalletTransfer =  async (req: Request, res: Response)
         }
 
         person.wallet.balance = person.wallet.transactions.reduce(
-          (sum, t) => sum + (t.amount || 0),
+          (sum: number, t: IWalletTransaction) => sum + (t.amount || 0),
           0,
         );
 
@@ -167,9 +181,9 @@ export const updateMultipleWalletTransfer =  async (req: Request, res: Response)
   } catch (error) {
     res.status(500).json({ message: "Error updating wallets" });
   }
-}
+};
 
-export const deleteTransaction =async (req: Request, res: Response) => {
+export const deleteTransaction = async (req: AuthRequest, res: Response) => {
   try {
     const { personId, transactionId } = req.body;
 
@@ -179,21 +193,26 @@ export const deleteTransaction =async (req: Request, res: Response) => {
       });
     }
 
-    const person = await People.findById(personId);
+    const PeopleModel = getPeopleModel(req.db);
+    if (!PeopleModel) {
+      return res.status(500).json({ error: "People model is not initialized" });
+    }
+
+    const person = await PeopleModel.findById(personId);
 
     if (!person) {
       return res.status(404).json({ message: "Person not found" });
     }
 
     const transactionIndex = person.wallet.transactions.findIndex(
-      (t) => t.transactionID === transactionId,
+      (t:IWalletTransaction) => t.transactionID === transactionId,
     );
 
     if (transactionIndex > -1) {
       person.wallet.transactions.splice(transactionIndex, 1);
 
       person.wallet.balance = person.wallet.transactions.reduce(
-        (sum, t) => sum + (t.amount || 0),
+        (sum: number, t: IWalletTransaction) => sum + (t.amount || 0),
         0,
       );
 
@@ -211,6 +230,6 @@ export const deleteTransaction =async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Error removing transaction" });
   }
-}
+};
 
 export default router;

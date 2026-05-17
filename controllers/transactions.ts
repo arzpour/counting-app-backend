@@ -1,12 +1,18 @@
-import { Request, Response, Router } from "express";
-import Transaction from "../models/transactions-new";
+import { Response, Router } from "express";
+import { getTransactionModel } from "../models/transactions";
+import { AuthRequest } from "../types/db";
 
 const router = Router();
 
 // GET all transactions
-export const getAllTransactions = async (req: Request, res: Response) => {
+export const getAllTransactions = async (req: AuthRequest, res: Response) => {
   try {
-    const transactions = await Transaction.find();
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      res.status(500).json({ error: "Transaction model is not initialized" });
+      return;
+    }
+    const transactions = await TransactionModel.find();
     res.json(transactions);
   } catch (error) {
     console.error("Error fetching transactions:", error);
@@ -15,9 +21,14 @@ export const getAllTransactions = async (req: Request, res: Response) => {
 };
 
 // GET transaction by ID
-export const getTransactionById = async (req: Request, res: Response) => {
+export const getTransactionById = async (req: AuthRequest, res: Response) => {
   try {
-    const transaction = await Transaction.findById(req.params.id);
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      res.status(500).json({ error: "Transaction model is not initialized" });
+      return;
+    }
+    const transaction = await TransactionModel.findById(req.params.id);
     if (!transaction) {
       return res.status(404).json({ error: "Transaction not found" });
     }
@@ -28,11 +39,20 @@ export const getTransactionById = async (req: Request, res: Response) => {
   }
 };
 
-
 // GET transactions by deal ID
-export const getTransactionByDealId = async (req: Request, res: Response) => {
+export const getTransactionByDealId = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
-    const transactions = await Transaction.find({ dealId: req.params.dealId });
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      res.status(500).json({ error: "Transaction model is not initialized" });
+      return;
+    }
+    const transactions = await TransactionModel.find({
+      dealId: req.params.dealId,
+    });
     res.json(transactions);
   } catch (error) {
     console.error("Error fetching transactions:", error);
@@ -40,11 +60,18 @@ export const getTransactionByDealId = async (req: Request, res: Response) => {
   }
 };
 
-
 // GET transactions by person ID
-export const getTransactionByPersonId = async (req: Request, res: Response) => {
+export const getTransactionByPersonId = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
-    const transactions = await Transaction.find({
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      res.status(500).json({ error: "Transaction model is not initialized" });
+      return;
+    }
+    const transactions = await TransactionModel.find({
       personId: req.params.personId,
     });
     res.json(transactions);
@@ -54,14 +81,18 @@ export const getTransactionByPersonId = async (req: Request, res: Response) => {
   }
 };
 
-
 // GET transactions by business account ID
 export const getTransactionsByBusinessAccountId = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
 ) => {
   try {
-    const transactions = await Transaction.find({
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      res.status(500).json({ error: "Transaction model is not initialized" });
+      return;
+    }
+    const transactions = await TransactionModel.find({
       bussinessAccountId: req.params.accountId,
     });
     res.json(transactions);
@@ -71,11 +102,18 @@ export const getTransactionsByBusinessAccountId = async (
   }
 };
 
-
 // GET transactions by type
-export const getTransactionsByType = async (req: Request, res: Response) => {
+export const getTransactionsByType = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
-    const transactions = await Transaction.find({ type: req.params.type });
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      res.status(500).json({ error: "Transaction model is not initialized" });
+      return;
+    }
+    const transactions = await TransactionModel.find({ type: req.params.type });
     res.json(transactions);
   } catch (error) {
     console.error("Error fetching transactions:", error);
@@ -83,12 +121,19 @@ export const getTransactionsByType = async (req: Request, res: Response) => {
   }
 };
 
-
 // GET transactions by date range
-export const getTransactionsByDate = async (req: Request, res: Response) => {
+export const getTransactionsByDate = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      res.status(500).json({ error: "Transaction model is not initialized" });
+      return;
+    }
     const { startDate, endDate } = req.query;
-    const transactions = await Transaction.find({
+    const transactions = await TransactionModel.find({
       transactionDate: {
         $gte: startDate,
         $lte: endDate,
@@ -101,11 +146,15 @@ export const getTransactionsByDate = async (req: Request, res: Response) => {
   }
 };
 
-
 // POST create new transaction
-export const createTransaction = async (req: Request, res: Response) => {
+export const createTransaction = async (req: AuthRequest, res: Response) => {
   try {
-    const newTransaction = new Transaction(req.body);
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      res.status(500).json({ error: "Transaction model is not initialized" });
+      return;
+    }
+    const newTransaction = new TransactionModel(req.body);
     const savedTransaction = await newTransaction.save();
     res.status(201).json(savedTransaction);
   } catch (error: any) {
@@ -117,11 +166,15 @@ export const createTransaction = async (req: Request, res: Response) => {
   }
 };
 
-
 // PUT update transaction by ID
-export const editTransactionById = async (req: Request, res: Response) => {
+export const editTransactionById = async (req: AuthRequest, res: Response) => {
   try {
-    const updatedTransaction = await Transaction.findByIdAndUpdate(
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      res.status(500).json({ error: "Transaction model is not initialized" });
+      return;
+    }
+    const updatedTransaction = await TransactionModel.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
       { new: true, runValidators: true },
@@ -139,9 +192,8 @@ export const editTransactionById = async (req: Request, res: Response) => {
   }
 };
 
-
 // DELETE transaction by ID
-// router.delete("/id/:id", async (req: Request, res: Response) => {
+// router.delete("/id/:id", async (req: AuthRequest, res: Response) => {
 //   try {
 //     const deletedTransaction = await Transaction.findByIdAndDelete(
 //       req.params.id,
@@ -159,17 +211,25 @@ export const editTransactionById = async (req: Request, res: Response) => {
 //   }
 // });
 
-export const deleteTransactionById = async (req: Request, res: Response) => {
+export const deleteTransactionById = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
-    const base = await Transaction.findById(req.params.id);
+    const TransactionModel = getTransactionModel(req.db);
+    if (!TransactionModel) {
+      res.status(500).json({ error: "Transaction model is not initialized" });
+      return;
+    }
+    const base = await TransactionModel.findById(req.params.id);
     if (!base) return res.status(404).json({ error: "Transaction not found" });
 
     if (base.isBetweenTwoPerson && base.pairGroupId) {
-      await Transaction.deleteMany({ pairGroupId: base.pairGroupId });
+      await TransactionModel.deleteMany({ pairGroupId: base.pairGroupId });
       return res.json({ message: "Both paired transactions deleted" });
     }
 
-    await Transaction.findByIdAndDelete(req.params.id);
+    await TransactionModel.findByIdAndDelete(req.params.id);
     res.json({
       message: "Transaction deleted successfully",
       transaction: base,
