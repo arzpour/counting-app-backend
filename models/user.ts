@@ -38,7 +38,7 @@ userSchema.pre("save", async function () {
 
 // compare hash and plain password
 userSchema.methods.comparePassword = async function (
-  userPassword: string
+  userPassword: string,
 ): Promise<boolean> {
   return await bcrypt.compare(userPassword, this.password);
 };
@@ -49,5 +49,5 @@ export const User = mongoose.model<IUser>("User", userSchema, "users");
 export function getUserModel(db: any) {
   if (!db) return null;
   if (db.models?.User) return db.models.User;
-  return db.model("User", userSchema);
+  return db.model("User", userSchema, "users");
 }

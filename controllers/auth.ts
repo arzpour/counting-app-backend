@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { User, userSchema } from "../models/user";
+import { getUserModel, userSchema } from "../models/user";
 import jwt from "jsonwebtoken";
 import { AuthRequest } from "../types/db";
 import { connectToDatabase } from "../db/connectToDB";
@@ -60,7 +60,7 @@ export const login = async (
     }
 
     req.db = connection;
-    const User = connection.model("User", userSchema);
+    const User = connection.model("User", userSchema, "users");
 
     const user = await User.findOne({ username }).select("+password");
 
@@ -80,12 +80,7 @@ export const login = async (
     res.status(200).json({
       status: "success",
       token: { accessToken },
-      data: {
-        user: {
-          id: user._id,
-          username: user.username,
-        },
-      },
+      data: { user },
       customerSlug,
     });
   } catch (error) {
@@ -95,15 +90,22 @@ export const login = async (
 };
 
 export const logout = async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const user = await User.findById((req as any).userId);
+    const UserModel = getUserModel(req.db);
+    if (!UserModel) {
+      res.status(500).json({ error: "User model is not initialized" });
+      return;
+    }
+
+    const user = await UserModel.findById((req as any).userId);
 
     if (user) {
       (user as any).refreshToken = null;
+      (user as any).accessToken = null;
       await user.save();
     }
 

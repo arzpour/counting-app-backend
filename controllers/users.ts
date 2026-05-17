@@ -9,7 +9,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
   try {
     const UserModel = getUserModel(req.db);
     if (!UserModel) {
-      return res.status(500).json({ error: "Deal model is not initialized" });
+      return res.status(500).json({ error: "User model is not initialized" });
     }
     const user = await UserModel.find();
     res.json(user);
